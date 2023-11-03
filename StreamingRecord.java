@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-import d2d.testing.gui.SaveStream;
+//import d2d.testing.gui.SaveStream;
 import d2d.testing.streaming.sessions.SessionBuilder;
 
 
@@ -19,12 +19,18 @@ public class StreamingRecord {
     private static class Record{
         private Streaming mStreaming;
         private boolean mAllowDispatch;
-        private SaveStream mSaveStream;
+        //private SaveStream mSaveStream;
 
-        public Record(Streaming streaming, boolean allowDispatch, SaveStream saveStream){
+//        public Record(Streaming streaming, boolean allowDispatch, SaveStream saveStream){
+//            mStreaming = streaming;
+//            mAllowDispatch = allowDispatch;
+//            mSaveStream =  saveStream;
+//        }
+
+        public Record(Streaming streaming, boolean allowDispatch){
             mStreaming = streaming;
             mAllowDispatch = allowDispatch;
-            mSaveStream =  saveStream;
+            //mSaveStream =  saveStream;
         }
     }
 
@@ -51,7 +57,7 @@ public class StreamingRecord {
     }
 
     public synchronized void addStreaming(Streaming streaming, boolean allowDispatch){
-        Record record = new Record(streaming, allowDispatch, null);
+        Record record = new Record(streaming, allowDispatch);
         mRecords.put(streaming.getUUID(), record);
         for(StreamingRecordObserver ob : mObservers){
             ob.streamingAvailable(streaming, allowDispatch);
@@ -73,9 +79,9 @@ public class StreamingRecord {
         Record rec = mRecords.get(id);
         if(rec != null){
             rec.mStreaming.setDownloadState(true);
-            SaveStream saveStream = new SaveStream(c, id.toString());
-            rec.mSaveStream = saveStream;
-            saveStream.startDownload();
+            //SaveStream saveStream = new SaveStream(c, id.toString());
+            //rec.mSaveStream = saveStream;
+            //saveStream.startDownload();
             for(StreamingRecordObserver ob : mObservers){
                 ob.streamingDownloadStateChanged(rec.mStreaming, true);
             }
@@ -86,8 +92,8 @@ public class StreamingRecord {
         Record rec = mRecords.get(id);
         if(rec != null){
             rec.mStreaming.setDownloadState(false);
-            rec.mSaveStream.stopDownload();
-            rec.mSaveStream = null;
+            //rec.mSaveStream.stopDownload();
+            //rec.mSaveStream = null;
             for(StreamingRecordObserver ob : mObservers){
                 ob.streamingDownloadStateChanged(rec.mStreaming, false);
             }
