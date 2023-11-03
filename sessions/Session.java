@@ -44,6 +44,8 @@ import d2d.testing.streaming.network.ProofManager;
 import d2d.testing.streaming.rtsp.RtspClient;
 import d2d.testing.streaming.video.VideoQuality;
 import d2d.testing.streaming.video.VideoStream;
+import inet.ipaddr.HostName;
+import inet.ipaddr.HostNameException;
 
 /**
  * You should instantiate this class with the {@link SessionBuilder}.<br />
@@ -137,6 +139,25 @@ public class Session {
 		mMainHandler = new Handler(Looper.getMainLooper());
 		mTimestamp = (uptime/1000)<<32 & (((uptime-((uptime/1000)*1000))>>32)/1000); // NTP timestamp
 		mSessionID = randomUUID().toString();
+	}
+
+	/**
+	 * Initializes the destination ip and port of the session given a string.
+	 * @param address
+	 */
+	public void setDestination(String address) {
+		HostName host = new HostName(address);
+		try {
+			if (host.toAddress().toString().indexOf(':') != -1) {
+				setDestinationAddress(host.toInetAddress(), true);
+				setDestinationPort(host.getPort());
+			} else {
+				setDestinationAddress(host.toInetAddress(), false);
+				setDestinationPort(host.getPort());
+			}
+		} catch (UnknownHostException | HostNameException e) {
+			throw new IllegalArgumentException("Invalid destination address. Must be a valid IPv4 or IPv6 address");
+		}
 	}
 
 	/**
