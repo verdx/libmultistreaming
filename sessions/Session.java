@@ -44,6 +44,7 @@ import d2d.testing.streaming.network.ProofManager;
 import d2d.testing.streaming.rtsp.RtspClient;
 import d2d.testing.streaming.video.VideoQuality;
 import d2d.testing.streaming.video.VideoStream;
+
 import inet.ipaddr.HostName;
 import inet.ipaddr.HostNameException;
 
@@ -150,14 +151,19 @@ public class Session {
 		try {
 			if (host.toAddress().toString().indexOf(':') != -1) {
 				setDestinationAddress(host.toInetAddress(), true);
-				setDestinationPort(host.getPort());
 			} else {
 				setDestinationAddress(host.toInetAddress(), false);
+			}
+			if (host.getPort() != null) {
 				setDestinationPort(host.getPort());
 			}
 		} catch (UnknownHostException | HostNameException e) {
 			throw new IllegalArgumentException("Invalid destination address. Must be a valid IPv4 or IPv6 address");
 		}
+	}
+
+	public int getDestinationPort() {
+		return mDestPort;
 	}
 
 	/**
@@ -341,12 +347,24 @@ public class Session {
 		}
 		sessionDescription.append("v=0\r\n");
 		// TODO: Add IPV6 support
-		if(mOriginIPv6) sessionDescription.append("o=- "+mTimestamp+" "+mTimestamp+" IN IP6 "+mOrigin.getHostAddress()+"\r\n");
-		else sessionDescription.append("o=- "+mTimestamp+" "+mTimestamp+" IN IP4 "+mOrigin.getHostAddress()+"\r\n");
+		if (mOrigin != null) {
+			if (mOriginIPv6)
+				sessionDescription.append("o=- " + mTimestamp + " " + mTimestamp + " IN IP6 " + mOrigin.getHostAddress() + "\r\n");
+			else
+				sessionDescription.append("o=- " + mTimestamp + " " + mTimestamp + " IN IP4 " + mOrigin.getHostAddress() + "\r\n");
+		} else {
+			sessionDescription.append("o=- " + mTimestamp + " " + mTimestamp + " NOT FOUND " + "\r\n");
+		}
 		sessionDescription.append("s="+ mStreamingName + "\r\n");
 		sessionDescription.append("i=N/A\r\n");
-		if(mDestIPv6) sessionDescription.append("c=IN IP6 "+mDestination.getHostAddress()+"\r\n");
-		else sessionDescription.append("c=IN IP4 "+mDestination.getHostAddress()+"\r\n");
+		if (mOrigin != null) {
+			if(mDestIPv6)
+				sessionDescription.append("c=IN IP6 "+mDestination.getHostAddress()+"\r\n");
+			else
+				sessionDescription.append("c=IN IP4 "+mDestination.getHostAddress()+"\r\n");
+		} else {
+			sessionDescription.append("c=NOT FOUND " + "\r\n");
+		}
 		// t=0 0 means the session is permanent (we don't know when it will stop)
 		sessionDescription.append("t=0 0\r\n");
 		sessionDescription.append("a=recvonly\r\n");
