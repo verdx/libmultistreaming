@@ -2,6 +2,7 @@ package d2d.testing.streaming.video;
 
 import android.content.Context;
 import android.graphics.Point;
+import android.graphics.SurfaceTexture;
 import android.hardware.camera2.CameraAccessException;
 import android.hardware.camera2.CameraCaptureSession;
 import android.hardware.camera2.CameraCharacteristics;
@@ -10,6 +11,7 @@ import android.hardware.camera2.CameraManager;
 import android.hardware.camera2.CaptureRequest;
 import android.hardware.camera2.params.StreamConfigurationMap;
 import android.media.CamcorderProfile;
+import android.media.MediaCodec;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.util.Size;
@@ -18,12 +20,16 @@ import android.view.Surface;
 import android.view.WindowManager;
 
 import androidx.annotation.NonNull;
+import androidx.preference.PreferenceManager;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+
+import d2d.testing.streaming.gui.AutoFitTextureView;
 
 public class CameraController {
 
@@ -40,6 +46,7 @@ public class CameraController {
     public static void initiateInstance(Context ctx){
         if(INSTANCE == null){
             INSTANCE = new CameraController(ctx);
+
         }
     }
 
@@ -57,6 +64,9 @@ public class CameraController {
     private CameraDevice mCameraDevice;
     private CaptureRequest.Builder mCaptureBuilder;
     private CameraCaptureSession mCaptureSession;
+    private AutoFitTextureView mTextureView;
+    private Context mContext;
+    private boolean mConfigured = false;
 
 
     private final CameraDevice.StateCallback mCamStCallback = new CameraDevice.StateCallback() {
@@ -120,17 +130,20 @@ public class CameraController {
         }
     };
 
-    private CameraController(Context ctx){
-        mCamManager = (CameraManager) ctx.getSystemService(Context.CAMERA_SERVICE);
-        mWinManager = (WindowManager) ctx.getSystemService(Context.WINDOW_SERVICE);
-        mCameraId = null;
+    private CameraController(Context context){
+        mCamManager = (CameraManager) context.getSystemService(Context.CAMERA_SERVICE);
+        mWinManager = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
         mListeners = new ArrayList<>();
         mCallbackHandlerTh = new HandlerThread("Camera Callback handler");
         mCallbackHandlerTh.start();
         mCallbackHandler = new Handler(mCallbackHandlerTh.getLooper());
+        mCameraId = "1";
+        mTextureView = null;
+        mContext = context;
+        mConfigured = false;
     }
 
-    public String[] getCameraIdList(){
+    private String[] getCameraIdList(){
         try {
             return mCamManager.getCameraIdList();
         } catch (CameraAccessException e) {return new String[0];}
@@ -147,33 +160,78 @@ public class CameraController {
         }
     }
 
+    public void configureCamera(AutoFitTextureView surface, Context context) {
+        mTextureView = surface;
+        mContext = context;
+        mConfigured = true;
+    }
 
-    public void startCamera(String cameraId, List<Surface> surfaceList){
-        mCameraId = cameraId;
-        mSurfaceList = surfaceList;
+    public void startCamera() {
 
-        try{
-            mCamManager.openCamera(cameraId, mCamStCallback, mCallbackHandler);
-        }
-        catch (SecurityException | CameraAccessException ex){
-            for(Callback cb : mListeners){
-                cb.cameraError(ex);
+        if (mConfigured == true) {
+            mSurfaceList = new ArrayList<>();
+            Size[] resolutions = getPrivType_2Target_MaxResolutions(mCameraId, SurfaceTexture.class, MediaCodec.class);
+
+            mTextureView.setAspectRatio(resolutions[0].getWidth(), resolutions[0].getHeight());
+            SurfaceTexture surfaceTexture = mTextureView.getSurfaceTexture();
+            surfaceTexture.setDefaultBufferSize(resolutions[0].getWidth(), resolutions[0].getHeight());
+            Surface surface1 = new Surface(surfaceTexture);
+            mSurfaceList.add(surface1);
+
+            try {
+                VideoPacketizerDispatcher.start(PreferenceManager.getDefaultSharedPreferences(mContext), VideoQuality.DEFAULT_VIDEO_QUALITY);
+            } catch (IOException e) {
+                e.printStackTrace();
             }
+            mSurfaceList.add(VideoPacketizerDispatcher.getEncoderInputSurface());
+
+            try {
+                mCamManager.openCamera(mCameraId, mCamStCallback, mCallbackHandler);
+            } catch (SecurityException | CameraAccessException ex) {
+                for (Callback cb : mListeners) {
+                    cb.cameraError(ex);
+                }
+            }
+        } else {
+            throw new IllegalStateException("Camera not configured");
         }
     }
 
     public void stopCamera(){
-        if(mCameraId == null) return;
         try {
             mCaptureSession.stopRepeating();
             mCaptureSession.abortCaptures();
             mCameraDevice.close();
         } catch (CameraAccessException ignored) {}
-        mCameraId = null;
         mSurfaceList = null;
         mCameraDevice = null;
         mCaptureBuilder = null;
         mCaptureSession = null;
+    }
+
+    public void switchCamera() {
+        String[] cameraIdList = getCameraIdList();
+        if(cameraFacingFront(mCameraId)) {
+            for (String id : cameraIdList) {
+                if (cameraFacingBack(id)) {
+                    mCameraId = id;
+                    break;
+                }
+            }
+        }
+        else if(cameraFacingBack(mCameraId)){
+            for (String id : cameraIdList) {
+                if (cameraFacingFront(id)) {
+                    mCameraId = id;
+                    break;
+                }
+            }
+        }
+
+        if (mConfigured) {
+            stopCamera();
+            startCamera();
+        }
     }
 
     public void addListener(Callback cb){
@@ -185,18 +243,7 @@ public class CameraController {
     }
 
 
-    public boolean itsCameraFacingFront(String cameraId){
-        try {
-            CameraCharacteristics characteristics = mCamManager.getCameraCharacteristics(cameraId);
-            Integer facing = characteristics.get(CameraCharacteristics.LENS_FACING);
-            if (facing != null && facing == CameraCharacteristics.LENS_FACING_FRONT) {
-                return true;
-            }
-        } catch (CameraAccessException ignored) {}
-        return false;
-    }
-
-    public boolean itsCameraFacingBack(String cameraId){
+    private boolean cameraFacingFront(String cameraId){
         try {
             CameraCharacteristics characteristics = mCamManager.getCameraCharacteristics(cameraId);
             Integer facing = characteristics.get(CameraCharacteristics.LENS_FACING);
@@ -207,7 +254,18 @@ public class CameraController {
         return false;
     }
 
-    public boolean itsCameraExternal(String cameraId){
+    private boolean cameraFacingBack(String cameraId){
+        try {
+            CameraCharacteristics characteristics = mCamManager.getCameraCharacteristics(cameraId);
+            Integer facing = characteristics.get(CameraCharacteristics.LENS_FACING);
+            if (facing != null && facing == CameraCharacteristics.LENS_FACING_FRONT) {
+                return true;
+            }
+        } catch (CameraAccessException ignored) {}
+        return false;
+    }
+
+    private boolean cameraExternal(String cameraId){
         try {
             CameraCharacteristics characteristics = mCamManager.getCameraCharacteristics(cameraId);
             Integer facing = characteristics.get(CameraCharacteristics.LENS_FACING);
