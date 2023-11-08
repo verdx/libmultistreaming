@@ -349,21 +349,21 @@ public class Session {
 		// TODO: Add IPV6 support
 		if (mOrigin != null) {
 			if (mOriginIPv6)
-				sessionDescription.append("o=- " + mTimestamp + " " + mTimestamp + " IN IP6 " + mOrigin.getHostAddress() + "\r\n");
+				sessionDescription.append("o= IN IP6 " + mOrigin.getHostAddress() + "\r\n");
 			else
-				sessionDescription.append("o=- " + mTimestamp + " " + mTimestamp + " IN IP4 " + mOrigin.getHostAddress() + "\r\n");
+				sessionDescription.append("o= IN IP4 " + mOrigin.getHostAddress() + "\r\n");
 		} else {
-			sessionDescription.append("o=- " + mTimestamp + " " + mTimestamp + " NOT FOUND " + "\r\n");
+			sessionDescription.append("o= NOT FOUND " + "\r\n");
 		}
 		sessionDescription.append("s="+ mStreamingName + "\r\n");
 		sessionDescription.append("i=N/A\r\n");
-		if (mOrigin != null) {
+		if (mDestination != null) {
 			if(mDestIPv6)
-				sessionDescription.append("c=IN IP6 "+mDestination.getHostAddress()+"\r\n");
+				sessionDescription.append("c= IN IP6 "+mDestination.getHostAddress()+"\r\n");
 			else
-				sessionDescription.append("c=IN IP4 "+mDestination.getHostAddress()+"\r\n");
+				sessionDescription.append("c= IN IP4 "+mDestination.getHostAddress()+"\r\n");
 		} else {
-			sessionDescription.append("c=NOT FOUND " + "\r\n");
+			sessionDescription.append("c= NOT FOUND " + "\r\n");
 		}
 		// t=0 0 means the session is permanent (we don't know when it will stop)
 		sessionDescription.append("t=0 0\r\n");
