@@ -1,8 +1,5 @@
 package d2d.testing.streaming;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
 import java.util.UUID;
 
 import d2d.testing.streaming.sessions.ReceiveSession;
