@@ -696,10 +696,6 @@ public class RTSPServerWorker extends AbstractWorker {
         final Pattern regexVideoDescription = Pattern.compile("m=video (\\S+)",Pattern.CASE_INSENSITIVE);
         final Pattern pattern = Pattern.compile("s=(\\w+)", Pattern.CASE_INSENSITIVE);
 
-        //Patrón del custom rtsp header
-        final Pattern regexProofFile = Pattern.compile("a=proof:file=(.+)",Pattern.CASE_INSENSITIVE);
-        final Pattern regexProofName = Pattern.compile("a=proof:name=(.+)",Pattern.CASE_INSENSITIVE);
-
         Matcher matcher;
         String streamName = "defaultName";
 
@@ -714,38 +710,6 @@ public class RTSPServerWorker extends AbstractWorker {
                 TrackInfo trackInfo = new TrackInfo();
                 trackInfo.setSessionDescription(line +"\r\n"+ reader.readLine() +"\r\n"+ reader.readLine() +"\r\n");
                 session.addVideoTrack(trackInfo);
-            }
-
-            //*******************
-            if(regexProofName.matcher(line).find()){
-                int firstEqualsIndex = line.indexOf('=');
-                int secondEqualsIndex = line.indexOf('=', firstEqualsIndex + 1);
-                String filename = line.substring(secondEqualsIndex + 1);
-
-                session.setProofFilename(filename);
-            }
-
-            if(regexProofFile.matcher(line).find()){
-                int firstEqualsIndex = line.indexOf('=');
-                int secondEqualsIndex = line.indexOf('=', firstEqualsIndex + 1);
-                String fileBytes = line.substring(secondEqualsIndex + 1);
-
-
-                if(fileBytes!=null){
-                    // Decode the incoming data from Base64 to binary
-                    byte[] decodedData = java.util.Base64.getDecoder().decode(fileBytes);
-
-                    session.setProofArr(decodedData);
-
-                    // Save the decoded data to a file with the .zip extension
-//                    File outputFile = new File(ProofManager.getInstance().getDownloadDir(), ProofManager.getInstance().getFileName() + ".zip");
-//                    if (!outputFile.exists()) {
-//                        outputFile.createNewFile();
-//                    }
-//                    try (FileOutputStream fos = new FileOutputStream(outputFile)) {
-//                        fos.write(decodedData);
-//                    }
-                }
             }
 
             matcher = pattern.matcher(line);

@@ -18,34 +18,23 @@
 
 package d2d.testing.streaming.rtsp;
 
-import android.net.ConnectivityManager;
-import android.net.Network;
-import android.net.NetworkCapabilities;
-import android.net.NetworkRequest;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.Looper;
 import android.util.Log;
-
-import androidx.annotation.NonNull;
 
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
-import java.net.ConnectException;
 import java.net.InetAddress;
-import java.net.InetSocketAddress;
 import java.net.Socket;
-import java.net.SocketAddress;
 import java.net.SocketException;
-import java.net.UnknownHostException;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -57,10 +46,8 @@ import java.util.UUID;
 import java.util.concurrent.Semaphore;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.zip.ZipOutputStream;
 
 import d2d.testing.streaming.network.INetworkManager;
-import d2d.testing.streaming.network.ProofManager;
 import d2d.testing.streaming.Stream;
 import d2d.testing.streaming.Streaming;
 import d2d.testing.streaming.StreamingRecord;
@@ -601,8 +588,6 @@ public class RtspClient implements StreamingRecordObserver {
 		String path = mLocalStreamingUUID.toString();
 		Log.d(TAG, "pipi" +  path);
 
-//		sendProofFile();
-
 		sendRequestAnnounce(mLocalStreamingState, path, mLocalStreamingSession.getSessionDescription());
 		sendRequestSetup(mLocalStreamingState, path, mLocalStreamingSession.getTrack(0), 0);
 		sendRequestSetup(mLocalStreamingState, path, mLocalStreamingSession.getTrack(1), 1);
@@ -616,37 +601,6 @@ public class RtspClient implements StreamingRecordObserver {
 		sendRequestSetup(st, path, session, 1);
 		sendRequestRecord(st, path);
 	}
-
-
-
-
-	private void sendProofFile(){
-		File proofFile = ProofManager.getInstance().getProofZipFile();
-
-		try {
-			FileInputStream fis = new FileInputStream(proofFile);
-			ByteArrayOutputStream baos = new ByteArrayOutputStream();
-
-			// Read the contents of the ZIP file into a byte array
-			byte[] buffer = new byte[1024];
-			int len;
-			while ((len = fis.read(buffer)) > 0) {
-				baos.write(buffer, 0, len);
-			}
-
-			// Encode the byte array as a Base64 string
-			String encodedData = Base64.getEncoder().encodeToString(baos.toByteArray());
-
-			mOutputStream.write(encodedData.getBytes(StandardCharsets.UTF_8));
-			mOutputStream.flush();
-
-		} catch (IOException e) {
-			throw new RuntimeException(e);
-		}
-
-	}
-
-
 
 
 

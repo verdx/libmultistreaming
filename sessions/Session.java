@@ -40,7 +40,6 @@ import d2d.testing.streaming.exceptions.CameraInUseException;
 import d2d.testing.streaming.exceptions.ConfNotSupportedException;
 import d2d.testing.streaming.exceptions.InvalidSurfaceException;
 import d2d.testing.streaming.exceptions.StorageUnavailableException;
-import d2d.testing.streaming.network.ProofManager;
 import d2d.testing.streaming.rtsp.RtspClient;
 import d2d.testing.streaming.video.VideoQuality;
 import d2d.testing.streaming.video.VideoStream;
@@ -377,30 +376,6 @@ public class Session {
 			sessionDescription.append(mVideoStream.getSessionDescription());
 			sessionDescription.append("a=control:trackID="+1+"\r\n");
 		}
-
-
-		File proofFile = ProofManager.getInstance().getProofZipFile();
-
-		try {
-			FileInputStream fis = new FileInputStream(proofFile);
-			ByteArrayOutputStream baos = new ByteArrayOutputStream();
-
-			byte[] buffer = new byte[1024];
-			int len;
-			while ((len = fis.read(buffer)) > 0) {
-				baos.write(buffer, 0, len);
-			}
-
-			// Encode the byte array as a Base64 string
-			String encodedData = Base64.getEncoder().encodeToString(baos.toByteArray());
-
-			sessionDescription.append("a=proof:name=" + ProofManager.getInstance().getFileName() + "\r\n");
-			sessionDescription.append("a=proof:file=" + encodedData);
-
-		} catch (IOException e) {
-			throw new RuntimeException(e);
-		}
-
 
 		return sessionDescription.toString();
 	}
