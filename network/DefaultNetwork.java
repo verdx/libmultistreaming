@@ -38,7 +38,7 @@ public class DefaultNetwork extends INetworkManager {
 
     private ScheduledExecutorService mScheduler;
 
-    public DefaultNetwork(Application app, ConnectivityManager conManager){
+    public DefaultNetwork(Application app, ConnectivityManager conManager) {
 
         mServerModel = null;
         this.mConManager = conManager;
@@ -86,7 +86,7 @@ public class DefaultNetwork extends INetworkManager {
     private boolean startLocalServer(){
         synchronized (DefaultNetwork.this){
             try {
-                mServerModel = new RTSPServerModel(mConManager);
+                mServerModel = new RTSPServerModel(mConManager, this);
                 mServerModel.startServer();
 
                 //Pone al server RTSP a escuchar en localhost:1234 para peticiones de descarga de libVLC

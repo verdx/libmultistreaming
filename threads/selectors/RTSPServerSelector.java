@@ -12,6 +12,7 @@ import java.nio.channels.ServerSocketChannel;
 import java.nio.channels.SocketChannel;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import d2d.testing.streaming.network.INetworkManager;
 import d2d.testing.streaming.network.RTSPServerModel;
 import d2d.testing.streaming.threads.workers.RTSPServerWorker;
 
@@ -27,10 +28,10 @@ public class RTSPServerSelector extends AbstractSelector {
 
     RTSPServerModel mController;
 
-    public RTSPServerSelector(RTSPServerModel controller, ConnectivityManager connManager) throws IOException {
+    public RTSPServerSelector(RTSPServerModel controller, ConnectivityManager connManager, INetworkManager networkManager) throws IOException {
         super(connManager);
         mController = controller;
-        mWorker = new RTSPServerWorker(null, null, this);
+        mWorker = new RTSPServerWorker(null, null, this, networkManager);
         mWorker.start();
     }
 

@@ -28,9 +28,10 @@ public class TrackInfo {
 
     private INetworkManager mNetworkManager;
 
-    public TrackInfo() {
+    public TrackInfo(INetworkManager networkManager) {
         setLocalPorts(16000 + new Random().nextInt(2000));
         setRemotePorts(14000 + new Random().nextInt(2000));
+        mNetworkManager = networkManager;
     }
 
     public void setLocalAddress(InetAddress localAddress){

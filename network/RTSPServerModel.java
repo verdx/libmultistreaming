@@ -21,15 +21,11 @@ import d2d.testing.streaming.threads.selectors.RTSPServerSelector;
 public class RTSPServerModel {
     public static final String TAG = "RTSPServerModel";
 
-    public RTSPServerSelector getmServer() {
-        return mServer;
-    }
-
     protected RTSPServerSelector mServer;
     private final Map<ServerSocketChannel, Connection> mServerChannelsMap;
 
-    public RTSPServerModel(ConnectivityManager connManager) throws IOException {
-        mServer = new RTSPServerSelector(this, connManager);
+    public RTSPServerModel(ConnectivityManager connManager, INetworkManager networkManager) throws IOException {
+        mServer = new RTSPServerSelector(this, connManager, networkManager);
         mServerChannelsMap = new HashMap<>();
     }
 
