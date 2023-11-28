@@ -137,7 +137,10 @@ public class CameraController {
         mCallbackHandlerTh = new HandlerThread("Camera Callback handler");
         mCallbackHandlerTh.start();
         mCallbackHandler = new Handler(mCallbackHandlerTh.getLooper());
-        mCameraId = "1";
+        mCameraId = "0";
+        if (cameraFacingBack(mCameraId)) {
+            switchCamera();
+        }
         mTextureView = null;
         mContext = context;
         mConfigured = false;
