@@ -1,6 +1,7 @@
 package d2d.testing.streaming.network;
 
 import android.app.Application;
+import android.content.Context;
 import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.NetworkCapabilities;
@@ -19,7 +20,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ScheduledExecutorService;
 
 import d2d.testing.streaming.rtsp.RTSPServerModel;
 import d2d.testing.streaming.rtsp.RtspClient;
@@ -35,8 +35,7 @@ public class DefaultNetwork extends INetworkManager {
     private RTSPServerModel mServerModel;
     private DestinationIPReader mDestinationReader;
     private SharedPreferences mSharedPrefs;
-
-    private ScheduledExecutorService mScheduler;
+    private static ConnectivityManager mConManager;
 
     public DefaultNetwork(Application app) {
 
@@ -52,6 +51,7 @@ public class DefaultNetwork extends INetworkManager {
 //        mDestinationReader = new DestinationIPReader(inputStream);
         mSharedPrefs = PreferenceManager.getDefaultSharedPreferences(app.getApplicationContext());
         mDestinationReader = new DestinationIPReader();
+        mConManager = (ConnectivityManager) app.getSystemService(Context.CONNECTIVITY_SERVICE);
     }
 
     private synchronized void checkDestinationsConnectivity() {
@@ -131,14 +131,13 @@ public class DefaultNetwork extends INetworkManager {
 
     @Override
     public ConnectivityManager getConnectivityManager() {
-        return null;
+        return mConManager;
     }
 
     @Override
     public InetAddress getInetAddress(NetworkCapabilities networkCapabilities) {
         TransportInfo ti = networkCapabilities.getTransportInfo();
-        InetAddress inetAddress = (InetAddress) ti;
-        return inetAddress;
+        return (InetAddress) ti;
     }
 
     @Override
