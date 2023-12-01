@@ -17,6 +17,7 @@ import java.util.Map;
 
 import d2d.testing.streaming.threads.selectors.ChangeRequest;
 import d2d.testing.streaming.threads.selectors.RTSPServerSelector;
+import kotlin.random.Random;
 
 public class RTSPServerModel {
     public static final String TAG = "RTSPServerModel";
@@ -24,8 +25,8 @@ public class RTSPServerModel {
     protected RTSPServerSelector mServer;
     private final Map<ServerSocketChannel, Connection> mServerChannelsMap;
 
-    public RTSPServerModel(ConnectivityManager connManager, INetworkManager networkManager) throws IOException {
-        mServer = new RTSPServerSelector(this, connManager, networkManager);
+    public RTSPServerModel(ConnectivityManager connManager) throws IOException {
+        mServer = new RTSPServerSelector(this, connManager);
         mServerChannelsMap = new HashMap<>();
     }
 
@@ -85,7 +86,19 @@ public class RTSPServerModel {
     }
 
     public void onServerRelease() {}
-    public synchronized Network getChannelNetwork(SelectableChannel chan){return null;}
+    public synchronized Network getChannelNetwork(SelectableChannel chan){
+        for(Map.Entry<ServerSocketChannel, Connection> entry : mServerChannelsMap.entrySet()){
+            if(entry.getKey().equals(chan)){
+                return entry.getValue().net;
+            }
+            for(SocketChannel sockChan : entry.getValue().mComChannels){
+                if(sockChan.equals(chan)){
+                    return entry.getValue().net;
+                }
+            }
+        }
+        return null;
+    }
 
     public void addServerSocketChannel(ServerSocketChannel serverSocketChannel) {
         mServerChannelsMap.put(serverSocketChannel, new Connection(serverSocketChannel));
@@ -105,6 +118,7 @@ public class RTSPServerModel {
         public ServerSocketChannel mServerSocketChannel;
         //Lista de sockets clientes conectados al socket server
         public List<SocketChannel> mComChannels;
+        public Network net;
 
         public void closeConnection(RTSPServerSelector serverSelector){
             serverSelector.addChangeRequest(new ChangeRequest(mServerSocketChannel, ChangeRequest.REMOVE, 0));

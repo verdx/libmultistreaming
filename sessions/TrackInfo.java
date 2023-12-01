@@ -26,12 +26,9 @@ public class TrackInfo {
     private String mSSRCHex;
     private String mSessionDescription;
 
-    private INetworkManager mNetworkManager;
-
-    public TrackInfo(INetworkManager networkManager) {
+    public TrackInfo() {
         setLocalPorts(16000 + new Random().nextInt(2000));
         setRemotePorts(14000 + new Random().nextInt(2000));
-        mNetworkManager = networkManager;
     }
 
     public void setLocalAddress(InetAddress localAddress){
@@ -39,10 +36,10 @@ public class TrackInfo {
     }
 
     public void startServer(Network receiveNet) throws IOException {
-        mRtcpUdpServer = new UDPServerSelector(mLocalAddress, mLocalRtcpPort, receiveNet, mNetworkManager.getConnectivityManager());
+        mRtcpUdpServer = new UDPServerSelector(mLocalAddress, mLocalRtcpPort, receiveNet, null);
         mRtcpUdpServer.start();
 
-        mRtpUdpServer = new UDPServerSelector(mLocalAddress, mLocalRtpPort, receiveNet, mNetworkManager.getConnectivityManager());
+        mRtpUdpServer = new UDPServerSelector(mLocalAddress, mLocalRtpPort, receiveNet, null);
         mRtpUdpServer.start();
     }
 
@@ -62,7 +59,7 @@ public class TrackInfo {
         SelectableChannel channel = null;
         try {
             channel = mRtcpUdpServer.addConnectionUDP(InetAddress.getByName(address), rtcpPort);
-        } catch (IOException e) {
+        } catch (IOException | NullPointerException e) {
             e.printStackTrace();
         }
         return channel;
@@ -72,7 +69,7 @@ public class TrackInfo {
         SelectableChannel channel = null;
         try {
             channel = mRtpUdpServer.addConnectionUDP(InetAddress.getByName(address), rtpPort);
-        } catch (IOException e) {
+        } catch (IOException | NullPointerException e) {
             e.printStackTrace();
         }
         return channel;

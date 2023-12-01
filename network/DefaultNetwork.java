@@ -32,16 +32,14 @@ public class DefaultNetwork extends INetworkManager {
 
     private final Map<String, RtspClient> mClients; //IP, cliente
     private RTSPServerModel mServerModel;
-    private static ConnectivityManager mConManager;
     private DestinationIPReader mDestinationReader;
     private SharedPreferences mSharedPrefs;
 
     private ScheduledExecutorService mScheduler;
 
-    public DefaultNetwork(Application app, ConnectivityManager conManager) {
+    public DefaultNetwork(Application app) {
 
         mServerModel = null;
-        this.mConManager = conManager;
 
         mClients = new HashMap<>();
 
@@ -86,7 +84,7 @@ public class DefaultNetwork extends INetworkManager {
     private boolean startLocalServer(){
         synchronized (DefaultNetwork.this){
             try {
-                mServerModel = new RTSPServerModel(mConManager, this);
+                mServerModel = new RTSPServerModel(null);
                 mServerModel.startServer();
 
                 //Pone al server RTSP a escuchar en localhost:1234 para peticiones de descarga de libVLC
@@ -128,7 +126,7 @@ public class DefaultNetwork extends INetworkManager {
 
     @Override
     public ConnectivityManager getConnectivityManager() {
-        return mConManager;
+        return null;
     }
 
     @Override
