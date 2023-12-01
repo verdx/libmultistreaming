@@ -416,7 +416,7 @@ public class RtspClient implements StreamingRecordObserver {
 	}
 
 	@Override
-	public void localStreamingAvailable(final UUID id, final String name, final SessionBuilder sessionBuilder) {
+	public void onLocalStreamingAvailable(final UUID id, final String name, final SessionBuilder sessionBuilder) {
 		mHandler.post(new Runnable() {
 			@Override
 			public void run() {
@@ -430,7 +430,7 @@ public class RtspClient implements StreamingRecordObserver {
 	}
 
 	@Override
-	public void localStreamingUnavailable() {
+	public void onLocalStreamingUnavailable() {
 		mHandler.post(new Runnable() {
 			@Override
 			public void run() {
@@ -441,7 +441,7 @@ public class RtspClient implements StreamingRecordObserver {
 
 
 	@Override
-	public void streamingAvailable(final Streaming streaming, final boolean bAllowDispatch) {
+	public void onStreamingAvailable(final Streaming streaming, final boolean bAllowDispatch) {
 		mHandler.post(new Runnable() {
 			@Override
 			public void run() {
@@ -468,7 +468,7 @@ public class RtspClient implements StreamingRecordObserver {
 	}
 
 	@Override
-	public void streamingUnavailable(final Streaming streaming) {
+	public void onStreamingUnavailable(final Streaming streaming) {
 		mHandler.post(new Runnable() {
 			@Override
 			public void run() {
@@ -482,7 +482,7 @@ public class RtspClient implements StreamingRecordObserver {
 	}
 
 	@Override
-	public void streamingDownloadStateChanged(Streaming streaming, boolean bIsDownload) {
+	public void onStreamingDownloadStateChanged(Streaming streaming, boolean bIsDownload) {
 
 	}
 

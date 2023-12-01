@@ -36,7 +36,6 @@ public class StreamingRecord {
 
     private final Map<UUID, Record> mRecords;
 
-
     private UUID mLocalStreamingUUID;
     private String mLocalStreamingName;
     private SessionBuilder mLocalStreamingBuilder;
@@ -60,7 +59,7 @@ public class StreamingRecord {
         Record record = new Record(streaming, allowDispatch);
         mRecords.put(streaming.getUUID(), record);
         for(StreamingRecordObserver ob : mObservers){
-            ob.streamingAvailable(streaming, allowDispatch);
+            ob.onStreamingAvailable(streaming, allowDispatch);
         }
     }
 
@@ -69,7 +68,7 @@ public class StreamingRecord {
         if(rec != null){
             rec.mAllowDispatch = allowDispatch;
             for(StreamingRecordObserver ob : mObservers){
-                ob.streamingAvailable(rec.mStreaming, allowDispatch);
+                ob.onStreamingAvailable(rec.mStreaming, allowDispatch);
             }
         }
     }
@@ -83,7 +82,7 @@ public class StreamingRecord {
             //rec.mSaveStream = saveStream;
             //saveStream.startDownload();
             for(StreamingRecordObserver ob : mObservers){
-                ob.streamingDownloadStateChanged(rec.mStreaming, true);
+                ob.onStreamingDownloadStateChanged(rec.mStreaming, true);
             }
         }
     }
@@ -95,7 +94,7 @@ public class StreamingRecord {
             //rec.mSaveStream.stopDownload();
             //rec.mSaveStream = null;
             for(StreamingRecordObserver ob : mObservers){
-                ob.streamingDownloadStateChanged(rec.mStreaming, false);
+                ob.onStreamingDownloadStateChanged(rec.mStreaming, false);
             }
         }
     }
@@ -105,7 +104,7 @@ public class StreamingRecord {
         mLocalStreamingName = name;
         mLocalStreamingBuilder = sessionBuilder;
         for(StreamingRecordObserver ob : mObservers){
-            ob.localStreamingAvailable(id, name ,sessionBuilder);
+            ob.onLocalStreamingAvailable(id, name ,sessionBuilder);
         }
     }
 
@@ -114,7 +113,7 @@ public class StreamingRecord {
         mLocalStreamingName = null;
         mLocalStreamingBuilder = null;
         for(StreamingRecordObserver ob : mObservers){
-            ob.localStreamingUnavailable();
+            ob.onLocalStreamingUnavailable();
         }
     }
 
@@ -142,7 +141,7 @@ public class StreamingRecord {
         Record rec =  mRecords.remove(id);
         if(rec != null){
             for(StreamingRecordObserver ob : mObservers){
-                ob.streamingUnavailable(rec.mStreaming);
+                ob.onStreamingUnavailable(rec.mStreaming);
             }
             return rec.mStreaming;
         }
@@ -152,10 +151,10 @@ public class StreamingRecord {
     public synchronized void addObserver(StreamingRecordObserver ob){
         mObservers.add(ob);
         if(mLocalStreamingUUID != null){
-            ob.localStreamingAvailable(mLocalStreamingUUID, mLocalStreamingName, mLocalStreamingBuilder);
+            ob.onLocalStreamingAvailable(mLocalStreamingUUID, mLocalStreamingName, mLocalStreamingBuilder);
         }
         for(Record rec : mRecords.values()){
-            ob.streamingAvailable(rec.mStreaming, rec.mAllowDispatch);
+            ob.onStreamingAvailable(rec.mStreaming, rec.mAllowDispatch);
         }
     }
 

@@ -5,9 +5,9 @@ import java.util.UUID;
 import d2d.testing.streaming.sessions.SessionBuilder;
 
 public interface StreamingRecordObserver {
-    void localStreamingAvailable(UUID id, String name, SessionBuilder sessionBuilder);
-    void localStreamingUnavailable();
-    void streamingAvailable(Streaming streaming, boolean bAllowDispatch);
-    void streamingUnavailable(Streaming streaming);
-    void streamingDownloadStateChanged(Streaming streaming, boolean bIsDownloading);
+    void onLocalStreamingAvailable(UUID id, String name, SessionBuilder sessionBuilder);
+    void onLocalStreamingUnavailable();
+    void onStreamingAvailable(Streaming streaming, boolean bAllowDispatch);
+    void onStreamingUnavailable(Streaming streaming);
+    void onStreamingDownloadStateChanged(Streaming streaming, boolean bIsDownloading);
 }
