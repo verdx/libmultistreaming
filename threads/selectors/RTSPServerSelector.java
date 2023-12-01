@@ -12,8 +12,7 @@ import java.nio.channels.ServerSocketChannel;
 import java.nio.channels.SocketChannel;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import d2d.testing.streaming.network.INetworkManager;
-import d2d.testing.streaming.network.RTSPServerModel;
+import d2d.testing.streaming.rtsp.RTSPServerModel;
 import d2d.testing.streaming.threads.workers.RTSPServerWorker;
 
 /**

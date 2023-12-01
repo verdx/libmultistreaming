@@ -1,4 +1,4 @@
-package d2d.testing.streaming.network;
+package d2d.testing.streaming.rtsp;
 
 import android.net.ConnectivityManager;
 import android.net.Network;
@@ -17,7 +17,6 @@ import java.util.Map;
 
 import d2d.testing.streaming.threads.selectors.ChangeRequest;
 import d2d.testing.streaming.threads.selectors.RTSPServerSelector;
-import kotlin.random.Random;
 
 public class RTSPServerModel {
     public static final String TAG = "RTSPServerModel";
