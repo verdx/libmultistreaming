@@ -33,6 +33,10 @@ public class RTSPServerModel {
         return mServer.addNewConnection(serverIP,serverPort);
     }
 
+    public synchronized boolean connectionExists(String serverIP, int serverPort){
+        return mServer.connectionExists(serverIP, serverPort);
+    }
+
     public void addNewConnection(ServerSocketChannel serverSocketChannel, Connection conn) {
         mServerChannelsMap.put(serverSocketChannel, conn);
     }

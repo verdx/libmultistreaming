@@ -85,12 +85,16 @@ public class DefaultNetwork extends INetworkManager {
     private boolean startLocalServer(){
         synchronized (DefaultNetwork.this){
             try {
-                mServerModel = new RTSPServerModel(null);
-                mServerModel.startServer();
+                if (mServerModel == null) {
+                    mServerModel = new RTSPServerModel(getConnectivityManager());
+                    mServerModel.startServer();
+                }
 
-                //Pone al server RTSP a escuchar en localhost:1234 para peticiones de descarga de libVLC
-                if(!mServerModel.addNewConnection("127.0.0.1", 1234)){
-                    throw new IOException();
+                if (!mServerModel.connectionExists("127.0.0.1", 1234)) {
+                    //Pone al server RTSP a escuchar en localhost:1234 para peticiones de descarga de libVLC
+                    if (!mServerModel.addNewConnection("127.0.0.1", 1234)) {
+                        throw new IOException();
+                    }
                 }
             } catch (IOException e) {
                 return false;

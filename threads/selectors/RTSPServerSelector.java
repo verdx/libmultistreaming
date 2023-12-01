@@ -6,6 +6,7 @@ import android.net.Network;
 import androidx.annotation.NonNull;
 import java.io.IOException;
 import java.net.InetSocketAddress;
+import java.net.Socket;
 import java.nio.channels.SelectableChannel;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.ServerSocketChannel;
@@ -55,6 +56,19 @@ public class RTSPServerSelector extends AbstractSelector {
             return false;
         }
         return true;
+    }
+
+    public synchronized boolean connectionExists(String serverIP, int serverPort) {
+        try {
+            Socket socket = new Socket();
+            socket.connect(new InetSocketAddress(serverIP, serverPort), 1000); // Intenta conectarse con un tiempo de espera corto
+            socket.close();
+            // Si no hay excepción, el puerto e IP están en uso
+            return true;
+        } catch (IOException e) {
+            // Captura la excepción cuando el puerto e IP no están en uso o hay un tiempo de espera
+            return false;
+        }
     }
 
 
