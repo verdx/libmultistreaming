@@ -29,7 +29,7 @@ public class UDPServerSelector extends AbstractSelector {
 
     public UDPServerSelector(InetAddress localAddress, int port, Network net, ConnectivityManager conManager) throws IOException {
         super(conManager);
-        if(conManager != null && net == null) throw new IllegalArgumentException("Network object cannot be null");
+        //if(conManager != null && net == null) throw new IllegalArgumentException("Network object cannot be null");
         mSocketNet = net;
         mPortUDP = port;
         mLocalAddress = localAddress;

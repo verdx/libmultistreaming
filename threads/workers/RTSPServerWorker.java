@@ -106,14 +106,12 @@ public class RTSPServerWorker extends AbstractWorker {
     private final String mPassword;
 
     private final RTSPServerSelector mServerSelector;
-    private INetworkManager mNetworkManager;
 
-    public RTSPServerWorker(String username, String password, RTSPServerSelector serverSelector, INetworkManager networkManager) {
+    public RTSPServerWorker(String username, String password, RTSPServerSelector serverSelector) {
         super(serverSelector);
         this.mUsername = username;
         this.mPassword = password;
         this.mServerSelector = serverSelector;
-        this.mNetworkManager = networkManager;
     }
 
     public RtspResponse processRequest(RtspRequest request, SelectableChannel channel) throws IllegalStateException, IOException {
@@ -704,13 +702,13 @@ public class RTSPServerWorker extends AbstractWorker {
 
         while((line = reader.readLine()) != null && line.length()>0) {
             if(regexAudioDescription.matcher(line).find()){
-                TrackInfo trackInfo = new TrackInfo(mNetworkManager);
+                TrackInfo trackInfo = new TrackInfo();
                 trackInfo.setSessionDescription(line +"\r\n"+ reader.readLine() +"\r\n"+ reader.readLine() +"\r\n");
                 session.addAudioTrack(trackInfo);
             }
 
             if(regexVideoDescription.matcher(line).find()){
-                TrackInfo trackInfo = new TrackInfo(mNetworkManager);
+                TrackInfo trackInfo = new TrackInfo();
                 trackInfo.setSessionDescription(line +"\r\n"+ reader.readLine() +"\r\n"+ reader.readLine() +"\r\n");
                 session.addVideoTrack(trackInfo);
             }

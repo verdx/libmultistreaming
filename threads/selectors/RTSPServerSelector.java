@@ -28,10 +28,10 @@ public class RTSPServerSelector extends AbstractSelector {
 
     RTSPServerModel mController;
 
-    public RTSPServerSelector(RTSPServerModel controller, ConnectivityManager connManager, INetworkManager networkManager) throws IOException {
+    public RTSPServerSelector(RTSPServerModel controller, ConnectivityManager connManager) throws IOException {
         super(connManager);
         mController = controller;
-        mWorker = new RTSPServerWorker(null, null, this, networkManager);
+        mWorker = new RTSPServerWorker(null, null, this);
         mWorker.start();
     }
 
