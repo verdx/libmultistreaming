@@ -82,7 +82,7 @@ public class DefaultNetwork extends INetworkManager {
         mClients.put(dest.ip, client);
     }
 
-    private boolean startLocalServer(){
+    public boolean startLocalServer(){
         synchronized (DefaultNetwork.this){
             try {
                 if (mServerModel == null) {
@@ -90,27 +90,24 @@ public class DefaultNetwork extends INetworkManager {
                     mServerModel.startServer();
                 }
 
-                if (!mServerModel.connectionExists("127.0.0.1", 1234)) {
-                    //Pone al server RTSP a escuchar en localhost:1234 para peticiones de descarga de libVLC
-                    if (!mServerModel.addNewConnection("127.0.0.1", 1234)) {
-                        throw new IOException();
-                    }
+                if (!mServerModel.addNewConnection("127.0.0.1", 1234)) {
+                    throw new IOException();
                 }
             } catch (IOException e) {
                 return false;
             }
         }
-        return true;
-    }
 
-    public boolean startServer() {
-        if(startLocalServer()){
-            return initServer();
+        if(mServerModel.isServerEnabled()) {
+            return mServerModel.addNewConnection();
+        } else {
+            return false;
         }
-        return false;
     }
 
-
+    public void stopLocalServer() {
+        mServerModel.stopServer();
+    }
 
     public boolean startClient() {
         int delayms = 10000;
@@ -124,9 +121,8 @@ public class DefaultNetwork extends INetworkManager {
         return true;
     }
 
-    private boolean initServer(){
-        if(!mServerModel.isServerEnabled()) return false;
-        return mServerModel.addNewConnection();
+    public void stopClient() {
+        workerHandle.removeCallbacksAndMessages(null);
     }
 
     @Override
@@ -145,7 +141,7 @@ public class DefaultNetwork extends INetworkManager {
         return DEFAULT_PORT;
     }
 
-    class DestinationInfo{
+    static class DestinationInfo{
         String ip;
         int port;
         boolean isConnected;
@@ -193,7 +189,7 @@ public class DefaultNetwork extends INetworkManager {
 
             for(String ipaddr: ipAddresses){
                 if(!ipaddr.equals(""))
-                    mDestinationList.add(new DestinationInfo(ipaddr, DEFAULT_PORT,false));
+                    mDestinationList.add(new DestinationInfo(ipaddr, DEFAULT_PORT, false));
             }
         }
     }

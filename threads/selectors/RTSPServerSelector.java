@@ -58,19 +58,6 @@ public class RTSPServerSelector extends AbstractSelector {
         return true;
     }
 
-    public synchronized boolean connectionExists(String serverIP, int serverPort) {
-        try {
-            Socket socket = new Socket();
-            socket.connect(new InetSocketAddress(serverIP, serverPort), 1000); // Intenta conectarse con un tiempo de espera corto
-            socket.close();
-            // Si no hay excepción, el puerto e IP están en uso
-            return true;
-        } catch (IOException e) {
-            // Captura la excepción cuando el puerto e IP no están en uso o hay un tiempo de espera
-            return false;
-        }
-    }
-
 
     public synchronized boolean upListeningPort(){
 
