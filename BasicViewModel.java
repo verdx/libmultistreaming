@@ -1,13 +1,7 @@
 package d2d.testing.streaming;
 
-import static android.content.Context.WIFI_SERVICE;
-
-import android.annotation.SuppressLint;
 import android.app.Application;
 import android.content.Context;
-import android.net.ConnectivityManager;
-import android.net.wifi.WifiInfo;
-import android.net.wifi.WifiManager;
 import android.os.HandlerThread;
 import android.util.Pair;
 import android.widget.Toast;
@@ -17,12 +11,6 @@ import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
-import java.net.InetAddress;
-import java.net.UnknownHostException;
-import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
-
-import d2d.testing.R;
 import d2d.testing.streaming.rtsp.RtspClient;
 
 public abstract class BasicViewModel extends AndroidViewModel implements RtspClient.Callback{
