@@ -27,8 +27,6 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.Enumeration;
 
-import d2d.testing.R;
-import d2d.testing.gui.main.WifiAwareNetwork;
 import d2d.testing.streaming.network.DefaultNetwork;
 
 public class DefaultViewModel extends BasicViewModel {
@@ -62,7 +60,7 @@ public class DefaultViewModel extends BasicViewModel {
         if(available){
             return SERVER_IP + ":" + SERVER_PORT;
         }
-        return c.getString(R.string.defaultnet_unavailable_str);
+        return "Network not available";
     }
 
     @Override
