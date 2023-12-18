@@ -11,7 +11,7 @@ import org.videolan.libvlc.LibVLC;
 import org.videolan.libvlc.Media;
 import org.videolan.libvlc.MediaPlayer;
 
-import d2d.testing.utils.IOUtils;
+import d2d.testing.streaming.utils.IOUtils;
 
 public class SaveStream implements MediaPlayer.EventListener {
     public final static String TAG = "SaveStream";
