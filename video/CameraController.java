@@ -171,7 +171,7 @@ public class CameraController {
 
     public void startCamera() {
 
-        if (mConfigured == true) {
+        if (mConfigured) {
             mSurfaceList = new ArrayList<>();
             Size[] resolutions = getPrivType_2Target_MaxResolutions(mCameraId, SurfaceTexture.class, MediaCodec.class);
 
