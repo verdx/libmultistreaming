@@ -1,6 +1,8 @@
 package d2d.testing.streaming;
 
+import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.text.method.ReplacementTransformationMethod;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -13,27 +15,28 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.facebook.shimmer.ShimmerFrameLayout;
-
 import java.util.ArrayList;
 import java.util.UUID;
 
-import d2d.testing.R;
-import d2d.testing.gui.main.MainFragment;
-import d2d.testing.gui.main.StreamDetail;
+import d2d.example.example2_receiver.R;
+import d2d.testing.streaming.gui.StreamDetail;
+import d2d.testing.streaming.gui.ViewStreamActivity;
 import d2d.testing.streaming.utils.IOUtils;
+
+import com.facebook.shimmer.ShimmerFrameLayout;
 
 public class StreamListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     private static final int VIEW_TYPE_DATA = 0;
     private static final int VIEW_TYPE_PLACEHOLDER = 1;
-    private Context mContext;
+    private final Context mContext;
     private ArrayList<StreamDetail> mStreams;
-    private MainFragment fragment;
 
-    public StreamListAdapter(Context context , ArrayList<d2d.testing.gui.main.StreamDetail> objects, MainFragment fragment) {
+    private final Activity mActivity;
+
+    public StreamListAdapter(Context context , ArrayList<StreamDetail> objects, Activity activity) {
         this.mStreams = objects;
         this.mContext = context;
-        this.fragment = fragment;
+        this.mActivity = activity;
     }
 
     @NonNull
@@ -58,7 +61,7 @@ public class StreamListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
     @Override
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, final int position) {
         if(holder instanceof  RealViewHolder){
-            d2d.testing.gui.main.StreamDetail sd = mStreams.get(position);
+            StreamDetail sd = mStreams.get(position);
 
             RealViewHolder realHolder = (RealViewHolder) holder;
 
@@ -101,12 +104,7 @@ public class StreamListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
                     R.drawable.button_download_pressed :
                     R.drawable.button_download);
 
-            realHolder.stream_layout.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    fragment.openStreamActivity(sd.getUuid());
-                }
-            });
+            realHolder.stream_layout.setOnClickListener(v -> openViewStreamActivity(sd.getUuid()));
         }
         else {
             PlaceViewHolder placeHolder = (PlaceViewHolder)holder;
@@ -115,6 +113,14 @@ public class StreamListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
 
 
     }
+
+    private void openViewStreamActivity(String uuid) {
+        Intent streamActivityIntent = new Intent(mContext, ViewStreamActivity.class);
+        streamActivityIntent.putExtra("isFromGallery", false);
+        streamActivityIntent.putExtra("UUID",uuid);
+        mActivity.startActivity(streamActivityIntent);
+    }
+
 
     @Override
     public int getItemCount() {
@@ -126,12 +132,12 @@ public class StreamListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
         return mStreams.get(position) == null? VIEW_TYPE_PLACEHOLDER : VIEW_TYPE_DATA;
     }
 
-    public void setStreamsData(ArrayList<d2d.testing.gui.main.StreamDetail> data){
+    public void setStreamsData(ArrayList<StreamDetail> data){
         mStreams = data;
         notifyDataSetChanged();
     }
 
-    class RealViewHolder extends RecyclerView.ViewHolder{
+    static class RealViewHolder extends RecyclerView.ViewHolder{
 
         TextView stream_name;
         ImageButton stream_download;
@@ -147,7 +153,7 @@ public class StreamListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
         }
     }
 
-    class PlaceViewHolder extends RecyclerView.ViewHolder{
+    static class PlaceViewHolder extends RecyclerView.ViewHolder{
 
         ShimmerFrameLayout shimmer;
 
@@ -158,9 +164,9 @@ public class StreamListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
     }
 
     private static class WordBreakTransformationMethod extends ReplacementTransformationMethod {
-        private static final char[] dash = new char[]{'-', '\u2011'};
+        private static final char[] dash = new char[]{'-', '‑'};
         private static final char[] space = new char[]{' ', '\u00A0'};
-        private static final char[] slash = new char[]{'/', '\u2215'};
+        private static final char[] slash = new char[]{'/', '∕'};
 
         private static final char[] original = new char[]{dash[0], space[0], slash[0]};
         private static final char[] replacement = new char[]{dash[1], space[1], slash[1]};
