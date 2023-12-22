@@ -1,4 +1,4 @@
-package d2d.testing.gui.main;
+package d2d.testing.streaming.gui;
 
 import android.annotation.SuppressLint;
 import android.os.Parcel;
