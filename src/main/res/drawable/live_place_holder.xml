@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:shape="rectangle"
+    app:cardElevation="6dp">
+    <!-- el boton tiene color rojo de fondo, por ejemplo -->
+    <solid android:color="@color/colorGray" />
+    <corners android:radius="100dp" />
+
+</shape>
