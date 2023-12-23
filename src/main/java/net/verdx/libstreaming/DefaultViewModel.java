@@ -15,11 +15,13 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.lifecycle.MutableLiveData;
 
+import java.io.InputStream;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.net.UnknownHostException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
+import java.util.ArrayList;
 import java.util.Enumeration;
 
 import net.verdx.libstreaming.network.DefaultNetwork;
@@ -33,6 +35,7 @@ public class DefaultViewModel extends BasicViewModel {
     public DefaultViewModel(@NonNull Application app) {
         super(app);
         mNetwork = new DefaultNetwork(app);
+
         SERVER_IP = getLocalIpAddress();
 
         mIsNetworkAvailable = new MutableLiveData<>(Boolean.TRUE);
@@ -47,7 +50,6 @@ public class DefaultViewModel extends BasicViewModel {
         app.registerReceiver(myReceiver, intentFilter);
 
         checkNetworkInterfaceAvailability();
-
     }
 
     @Override
@@ -116,5 +118,17 @@ public class DefaultViewModel extends BasicViewModel {
         } catch (UnknownHostException e) {
             return "Local address not found";
         }
+    }
+
+    public void setDestinationIpsArray(ArrayList<String> ipAddresses){
+        mNetwork.setDestinationIpsArray(ipAddresses);
+    }
+
+    public void setDestinationIpsSettings(Application app) {
+        mNetwork.setDestinationIpsSetting(app);
+    }
+
+    public void setDestinationIpsStream(InputStream stream){
+        mNetwork.setDestinationIpsStream(stream);
     }
 }

@@ -28,7 +28,7 @@ public class DefaultNetwork extends INetworkManager {
 
     public static int DEFAULT_PORT = 8080;
 
-    private Handler workerHandle;
+    private final Handler workerHandle;
     private final HandlerThread worker;
 
     private final Map<String, RtspClient> mClients; //IP, cliente
@@ -42,7 +42,6 @@ public class DefaultNetwork extends INetworkManager {
         worker = new HandlerThread("DefaultNetwork Worker");
         worker.start();
         workerHandle = new Handler(worker.getLooper());
-        DestinationIPReader.setDestinationIpsSetting(app);
         mConManager = (ConnectivityManager) app.getSystemService(Context.CONNECTIVITY_SERVICE);
     }
 
@@ -209,4 +208,14 @@ public class DefaultNetwork extends INetworkManager {
         }
     }
 
+    public void setDestinationIpsArray(ArrayList<String> ipAddresses){
+            DestinationIPReader.setDestinationIpsArray(ipAddresses);
+    }
+    public void setDestinationIpsSetting(Application app){
+            DestinationIPReader.setDestinationIpsSetting(app);
+    }
+
+    public void setDestinationIpsStream(InputStream inputStream){
+            DestinationIPReader.setDestinationIpsStream(inputStream);
+    }
 }
