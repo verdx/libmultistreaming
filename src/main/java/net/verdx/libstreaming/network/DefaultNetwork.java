@@ -34,23 +34,38 @@ public class DefaultNetwork extends INetworkManager {
     private final Map<String, RtspClient> mClients; //IP, cliente
     private RTSPServerModel mServerModel;
     private DestinationIPReader mDestinationReader;
-    private SharedPreferences mSharedPrefs;
     private static ConnectivityManager mConManager;
 
     public DefaultNetwork(Application app) {
 
         mServerModel = null;
-
         mClients = new HashMap<>();
-
         worker = new HandlerThread("DefaultNetwork Worker");
         worker.start();
         workerHandle = new Handler(worker.getLooper());
+        mDestinationReader = new DestinationIPReader(app);
+        mConManager = (ConnectivityManager) app.getSystemService(Context.CONNECTIVITY_SERVICE);
+    }
 
-//        InputStream inputStream = app.getResources().openRawResource(R.raw.destinations);
-//        mDestinationReader = new DestinationIPReader(inputStream);
-        mSharedPrefs = PreferenceManager.getDefaultSharedPreferences(app.getApplicationContext());
-        mDestinationReader = new DestinationIPReader();
+    public DefaultNetwork(Application app, InputStream inputStream) {
+
+        mServerModel = null;
+        mClients = new HashMap<>();
+        worker = new HandlerThread("DefaultNetwork Worker");
+        worker.start();
+        workerHandle = new Handler(worker.getLooper());
+        mDestinationReader = new DestinationIPReader(inputStream);
+        mConManager = (ConnectivityManager) app.getSystemService(Context.CONNECTIVITY_SERVICE);
+    }
+
+    public DefaultNetwork(Application app, ArrayList<String> ipAddresses) {
+
+        mServerModel = null;
+        mClients = new HashMap<>();
+        worker = new HandlerThread("DefaultNetwork Worker");
+        worker.start();
+        workerHandle = new Handler(worker.getLooper());
+        mDestinationReader = new DestinationIPReader(ipAddresses);
         mConManager = (ConnectivityManager) app.getSystemService(Context.CONNECTIVITY_SERVICE);
     }
 
@@ -153,21 +168,26 @@ public class DefaultNetwork extends INetworkManager {
         }
     }
 
-    public class DestinationIPReader{
+    public static class DestinationIPReader{
 
         List<DestinationInfo> mDestinationList;
 
+        public DestinationIPReader(ArrayList<String> ipAddresses){
+            mDestinationList = new ArrayList<>();
+            getDestinationIpsArray(ipAddresses);
+        }
+
         public DestinationIPReader(InputStream inputStream){
             mDestinationList = new ArrayList<>();
-            getDestinationIps(inputStream);
+            getDestinationIpsStream(inputStream);
         }
 
-        public DestinationIPReader(){
+        public DestinationIPReader(Application app){
             mDestinationList = new ArrayList<>();
-            getDestinationIps();
+            getDestinationIpsSetting(app);
         }
 
-        private void getDestinationIps(InputStream inputStream){
+        private void getDestinationIpsStream(InputStream inputStream){
             try {
                 InputStreamReader inputStreamReader = new InputStreamReader(inputStream);
                 BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
@@ -175,16 +195,27 @@ public class DefaultNetwork extends INetworkManager {
                 while ((line = bufferedReader.readLine()) != null) {
                     String[] res = line.split(":");
 
-                    mDestinationList.add(new DestinationInfo(res[0], Integer.valueOf(res[1]), false));
+                    mDestinationList.add(new DestinationInfo(res[0], Integer.parseInt(res[1]), false));
                 }
             } catch (IOException e) {
                 e.printStackTrace();
             }
         }
 
-        private void getDestinationIps(){
+        private void getDestinationIpsSetting(Application app){
+
+            SharedPreferences mSharedPrefs = PreferenceManager.getDefaultSharedPreferences(app.getApplicationContext());
             String[] ipAddresses = mSharedPrefs.getString("PREF_IP_ADDRESS", "").split("\\n");
 
+            mDestinationList.clear();
+
+            for(String ipaddr: ipAddresses){
+                if(!ipaddr.equals(""))
+                    mDestinationList.add(new DestinationInfo(ipaddr, DEFAULT_PORT, false));
+            }
+        }
+
+        private void getDestinationIpsArray(ArrayList<String> ipAddresses){
             mDestinationList.clear();
 
             for(String ipaddr: ipAddresses){
