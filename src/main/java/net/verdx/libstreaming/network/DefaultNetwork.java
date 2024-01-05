@@ -209,13 +209,13 @@ public class DefaultNetwork extends INetworkManager {
     }
 
     public void setDestinationIpsArray(ArrayList<String> ipAddresses){
-            DestinationIPReader.setDestinationIpsArray(ipAddresses);
+        DestinationIPReader.setDestinationIpsArray(ipAddresses);
     }
     public void setDestinationIpsSetting(Application app){
-            DestinationIPReader.setDestinationIpsSetting(app);
+        DestinationIPReader.setDestinationIpsSetting(app);
     }
 
     public void setDestinationIpsStream(InputStream inputStream){
-            DestinationIPReader.setDestinationIpsStream(inputStream);
+        DestinationIPReader.setDestinationIpsStream(inputStream);
     }
 }
