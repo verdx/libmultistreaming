@@ -76,7 +76,11 @@ public class StreamListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
                 name = desc[0].replace("_", " ");
             }
 
-            author = desc[1].replace("_", " ");
+            if (desc.length > 1) {
+                author = desc[1].replace("_", " ");
+            } else {
+                author = "unknown";
+            }
 
             realHolder.stream_name.setTransformationMethod(new WordBreakTransformationMethod());
             realHolder.stream_name.setText(name);
