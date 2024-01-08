@@ -225,8 +225,7 @@ public class EncoderDebugger {
 					// Starts the encoder
 					configureEncoder();
 					searchSPSandPPS();
-					//mEncoder.release();
-					//if(true) return;
+					
 
 
 					if (VERBOSE) Log.v(TAG, "SPS and PPS in b64: SPS="+mB64SPS+", PPS="+mB64PPS);
