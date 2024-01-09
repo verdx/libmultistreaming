@@ -27,10 +27,7 @@ import net.verdx.libstreaming.rtsp.RtspClient;
 public class DefaultNetwork extends INetworkManager {
 
     public static int DEFAULT_PORT = 8080;
-
     private final Handler workerHandle;
-    private final HandlerThread worker;
-
     private final Map<String, RtspClient> mClients; //IP, cliente
     private RTSPServerModel mServerModel;
     private static ConnectivityManager mConManager;
@@ -81,7 +78,9 @@ public class DefaultNetwork extends INetworkManager {
                 }
             }
             else{
-                info.isConnected = client.isConnected();
+                if (client != null) {
+                    info.isConnected = client.isConnected();
+                }
             }
         }
     }
@@ -145,8 +144,13 @@ public class DefaultNetwork extends INetworkManager {
 
     @Override
     public InetAddress getInetAddress(NetworkCapabilities networkCapabilities) {
-        TransportInfo ti = networkCapabilities.getTransportInfo();
-        return (InetAddress) ti;
+        TransportInfo ti;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            ti = networkCapabilities.getTransportInfo();
+            return (InetAddress) ti;
+        } else {
+            return null;
+        }
     }
 
     @Override
@@ -206,12 +210,16 @@ public class DefaultNetwork extends INetworkManager {
                     mDestinationList.add(new DestinationInfo(ipaddr, DEFAULT_PORT, false));
             }
         }
+
+        private static void setEmptyDestinationIps(){
+            mDestinationList = new ArrayList<>();
+        }
     }
 
     public void setDestinationIpsArray(ArrayList<String> ipAddresses){
         DestinationIPReader.setDestinationIpsArray(ipAddresses);
     }
-    public void setDestinationIpsSetting(Application app){
+    public void setDestinationIpsSettings(Application app){
         DestinationIPReader.setDestinationIpsSetting(app);
     }
 

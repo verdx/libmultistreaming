@@ -29,8 +29,8 @@ public abstract class BasicViewModel extends AndroidViewModel implements RtspCli
         return mIsNetworkAvailable;
     }
 
-    public Pair<Boolean, String> getDeviceStatus(Context c) {
-        if (mIsNetworkAvailable.getValue()) {
+    public Pair<Boolean, String> getDeviceNetworkStatus(Context c) {
+        if (Boolean.TRUE.equals(mIsNetworkAvailable.getValue())) {
             return new Pair<>(Boolean.TRUE, getNetworkAvailabilityString(c, true));
         }
         else {

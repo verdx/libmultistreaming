@@ -125,7 +125,7 @@ public class DefaultViewModel extends BasicViewModel {
     }
 
     public void setDestinationIpsSettings(Application app) {
-        mNetwork.setDestinationIpsSetting(app);
+        mNetwork.setDestinationIpsSettings(app);
     }
 
     public void setDestinationIpsStream(InputStream stream){
