@@ -6,6 +6,7 @@ import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.NetworkCapabilities;
 import android.net.TransportInfo;
+import android.os.Build;
 import android.os.Handler;
 import android.os.HandlerThread;
 
@@ -36,32 +37,11 @@ public class DefaultNetwork extends INetworkManager {
 
         mServerModel = null;
         mClients = new HashMap<>();
-        worker = new HandlerThread("DefaultNetwork Worker");
+        HandlerThread worker = new HandlerThread("DefaultNetwork Worker");
         worker.start();
         workerHandle = new Handler(worker.getLooper());
         mConManager = (ConnectivityManager) app.getSystemService(Context.CONNECTIVITY_SERVICE);
-    }
-
-    public DefaultNetwork(Application app, InputStream inputStream) {
-
-        mServerModel = null;
-        mClients = new HashMap<>();
-        worker = new HandlerThread("DefaultNetwork Worker");
-        worker.start();
-        workerHandle = new Handler(worker.getLooper());
-        DestinationIPReader.setDestinationIpsStream(inputStream);
-        mConManager = (ConnectivityManager) app.getSystemService(Context.CONNECTIVITY_SERVICE);
-    }
-
-    public DefaultNetwork(Application app, ArrayList<String> ipAddresses) {
-
-        mServerModel = null;
-        mClients = new HashMap<>();
-        worker = new HandlerThread("DefaultNetwork Worker");
-        worker.start();
-        workerHandle = new Handler(worker.getLooper());
-        DestinationIPReader.setDestinationIpsArray(ipAddresses);
-        mConManager = (ConnectivityManager) app.getSystemService(Context.CONNECTIVITY_SERVICE);
+        DestinationIPReader.setEmptyDestinationIps();
     }
 
     private synchronized void checkDestinationsConnectivity() {
