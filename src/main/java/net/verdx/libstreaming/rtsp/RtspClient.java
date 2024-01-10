@@ -363,7 +363,9 @@ public class RtspClient implements StreamingRecordObserver {
 		if(mLocalStreamingUUID != null){
 			try {
 				sendRequestTeardown(mLocalStreamingState, mLocalStreamingUUID.toString());
-			} catch (Exception ignore) {}
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
 			if(mLocalStreamingSession != null){
 				if (mLocalStreamingSession.isStreaming()) {
 					mLocalStreamingSession.syncStop();

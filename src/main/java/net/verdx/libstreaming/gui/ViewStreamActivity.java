@@ -17,6 +17,10 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 
 import net.verdx.libstreaming.R;
+import net.verdx.libstreaming.Streaming;
+import net.verdx.libstreaming.StreamingRecord;
+import net.verdx.libstreaming.StreamingRecordObserver;
+import net.verdx.libstreaming.sessions.SessionBuilder;
 
 import org.videolan.libvlc.IVLCVout;
 import org.videolan.libvlc.LibVLC;
@@ -24,9 +28,10 @@ import org.videolan.libvlc.Media;
 import org.videolan.libvlc.MediaPlayer;
 
 import java.util.ArrayList;
+import java.util.UUID;
 
 
-public class ViewStreamActivity extends AppCompatActivity implements IVLCVout.Callback,MediaPlayer.EventListener, TextureView.SurfaceTextureListener {
+public class ViewStreamActivity extends AppCompatActivity implements IVLCVout.Callback, MediaPlayer.EventListener, TextureView.SurfaceTextureListener, StreamingRecordObserver {
     public final static String TAG = "VideoActivity";
 
     private SurfaceHolder holder;
@@ -64,9 +69,9 @@ public class ViewStreamActivity extends AppCompatActivity implements IVLCVout.Ca
 
     private String rtspUrl;
     private String videoFilePath;
-
     private boolean isFromGallery;
     private TextureView mTextureView;
+    private String streamUUID;
 
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -76,7 +81,6 @@ public class ViewStreamActivity extends AppCompatActivity implements IVLCVout.Ca
 
         this.setContentView(R.layout.activity_view_stream);
 
-        String uuid;
         isFromGallery = getIntent().getExtras().getBoolean("isFromGallery");
 
 
@@ -93,9 +97,9 @@ public class ViewStreamActivity extends AppCompatActivity implements IVLCVout.Ca
             });
         }
         else {
-            uuid = getIntent().getExtras().getString("UUID");
+            streamUUID = getIntent().getExtras().getString("UUID");
             // Get URL
-            rtspUrl = "rtsp://127.0.0.1:1234/" + uuid;
+            rtspUrl = "rtsp://127.0.0.1:1234/" + streamUUID;
             Log.d(TAG, "Playing back " + rtspUrl);
         }
 
@@ -103,6 +107,8 @@ public class ViewStreamActivity extends AppCompatActivity implements IVLCVout.Ca
         mTextureView = (TextureView) findViewById(R.id.videoplayer);
         mTextureView.setRotation(90);
         mTextureView.setSurfaceTextureListener(this);
+
+        StreamingRecord.getInstance().addObserver(this);
     }
 
     private void startPlayVideo(){
@@ -211,25 +217,50 @@ public class ViewStreamActivity extends AppCompatActivity implements IVLCVout.Ca
         libvlc = null;
     }
 
+    private void streamStopped() {
+        releasePlayer();
+        Log.e("DEBUG", "DEBUG:Stream stopped");
+        finish();
+    }
+
     @Override
     public void onEvent(MediaPlayer.Event event) {
         switch(event.type) {
             case MediaPlayer.Event.EndReached:
                 Log.e(TAG, "MediaPlayerEndReached");
-                releasePlayer();
-                Toast.makeText(getApplicationContext(), "Streaming finished", Toast.LENGTH_SHORT).show();
-                finish();
-                break;
-            case MediaPlayer.Event.Buffering:
+                streamStopped();
                 break;
             case MediaPlayer.Event.Playing:
                 bufferSpinner.setVisibility(View.INVISIBLE);
                 break;
             case MediaPlayer.Event.Paused:
             case MediaPlayer.Event.Stopped:
-                Log.e(TAG, "EL STREAMING HA PARADO");
+                Log.e(TAG, "MediaPlayerStopped");
+
+            case MediaPlayer.Event.Buffering:
             default:
                 break;
         }
     }
+
+    @Override
+    public void onLocalStreamingAvailable(UUID id, String name, SessionBuilder sessionBuilder) {}
+
+    @Override
+    public void onLocalStreamingUnavailable() {}
+
+    @Override
+    public void onStreamingAvailable(Streaming streaming, boolean bAllowDispatch) {}
+
+    @Override
+    public void onStreamingUnavailable(Streaming streaming) {
+        if(streaming.getUUID().toString().equals(streamUUID)) {
+            Log.e(TAG, "The streaming has become unavailable");
+            mMediaPlayer.stop();
+            streamStopped();
+        }
+    }
+
+    @Override
+    public void onStreamingDownloadStateChanged(Streaming streaming, boolean bIsDownloading) {}
 }
