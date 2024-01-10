@@ -3,6 +3,7 @@ package net.verdx.libstreaming.rtsp;
 import android.util.Log;
 
 import java.io.IOException;
+import java.util.Objects;
 
 public class RtspResponse {
     public final static String LOG_TAG = "RtspResponse";
@@ -36,7 +37,7 @@ public class RtspResponse {
         int seqid = -1;
 
         try {
-            seqid = Integer.parseInt(mRequest.headers.get("cseq").replace(" ",""));
+            if (mRequest != null) seqid = Integer.parseInt(Objects.requireNonNull(mRequest.headers.get("cseq")).replace(" ",""));
         } catch (Exception e) {
             Log.e(LOG_TAG,"Error parsing CSeq: "+(e.getMessage()!=null?e.getMessage():""));
         }

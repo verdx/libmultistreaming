@@ -5,15 +5,14 @@ import android.graphics.SurfaceTexture;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.SurfaceHolder;
 import android.view.TextureView;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.MediaController;
 import android.widget.ProgressBar;
-import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import net.verdx.libstreaming.R;
@@ -28,13 +27,12 @@ import org.videolan.libvlc.Media;
 import org.videolan.libvlc.MediaPlayer;
 
 import java.util.ArrayList;
+import java.util.Objects;
 import java.util.UUID;
 
 
 public class ViewStreamActivity extends AppCompatActivity implements IVLCVout.Callback, MediaPlayer.EventListener, TextureView.SurfaceTextureListener, StreamingRecordObserver {
     public final static String TAG = "VideoActivity";
-
-    private SurfaceHolder holder;
 
     // media player
     private LibVLC libvlc;
@@ -81,7 +79,7 @@ public class ViewStreamActivity extends AppCompatActivity implements IVLCVout.Ca
 
         this.setContentView(R.layout.activity_view_stream);
 
-        isFromGallery = getIntent().getExtras().getBoolean("isFromGallery");
+        isFromGallery = Objects.requireNonNull(getIntent().getExtras()).getBoolean("isFromGallery");
 
 
         if(isFromGallery){
@@ -169,22 +167,22 @@ public class ViewStreamActivity extends AppCompatActivity implements IVLCVout.Ca
     }
 
     @Override
-    public void onSurfaceTextureAvailable(SurfaceTexture surface, int width, int height) {
+    public void onSurfaceTextureAvailable(@NonNull SurfaceTexture surface, int width, int height) {
         startPlayVideo();
     }
 
     @Override
-    public void onSurfaceTextureSizeChanged(SurfaceTexture surface, int width, int height) {
+    public void onSurfaceTextureSizeChanged(@NonNull SurfaceTexture surface, int width, int height) {
 
     }
 
     @Override
-    public boolean onSurfaceTextureDestroyed(SurfaceTexture surface) {
+    public boolean onSurfaceTextureDestroyed(@NonNull SurfaceTexture surface) {
         return false;
     }
 
     @Override
-    public void onSurfaceTextureUpdated(SurfaceTexture surface) {
+    public void onSurfaceTextureUpdated(@NonNull SurfaceTexture surface) {
 
     }
 
@@ -212,14 +210,12 @@ public class ViewStreamActivity extends AppCompatActivity implements IVLCVout.Ca
         final IVLCVout vout = mMediaPlayer.getVLCVout();
         vout.removeCallback(this);
         vout.detachViews();
-        holder = null;
         libvlc.release();
         libvlc = null;
     }
 
     private void streamStopped() {
         releasePlayer();
-        Log.e("DEBUG", "DEBUG:Stream stopped");
         finish();
     }
 
@@ -255,7 +251,7 @@ public class ViewStreamActivity extends AppCompatActivity implements IVLCVout.Ca
     @Override
     public void onStreamingUnavailable(Streaming streaming) {
         if(streaming.getUUID().toString().equals(streamUUID)) {
-            Log.e(TAG, "The streaming has become unavailable");
+            Log.e(TAG, "The stream has become unavailable");
             mMediaPlayer.stop();
             streamStopped();
         }
