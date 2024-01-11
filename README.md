@@ -222,10 +222,9 @@ The `onCreate´ method in this Activity or Fragment should include all of these 
         StreamingRecord.getInstance().addObserver(this);
 
         /*
-        Initialize the ViewModel, set the Incoming IPs(in this example from a EditText) and observe the network status
+        Initialize the ViewModel and observe the network status
          */
         mViewModel = new DefaultViewModel(this.getApplication());
-        setIncomingIps();
         mViewModel.isNetworkAvailable().observe(this, (Observer<Boolean>) aBoolean -> {
             isNetworkAvailable = aBoolean;
             mStatusTextView.setText(getDeviceStatus());
