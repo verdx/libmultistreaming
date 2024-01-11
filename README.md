@@ -60,7 +60,7 @@ $ git submodule add https://github.com/verdx/libstreaming2.0
 
 This example is extracted from [this simple app](htpps://github.com/verdx/libstreaming2.0-examples#Example2-sender). This Activity could also be a Fragment.
 
-The `StreamingRecordObserver´ is needed in this case to listen on when a local stream has been started or ended. The ´TextureView.SurfaceTextureListener´ is used to be notified when the custom ´AutoFitTextureView´ is prepared to host the camera output.
+Both the ´StreamingRecordObserver´ and ´TextureView.SurfaceTextureListener´ are technically optional in this case, but very recommended. The ´StreamingRecordObserver´ is used to be notified when a local stream has been started or ended. The ´TextureView.SurfaceTextureListener´ is used to be notified when the custom ´AutoFitTextureView´ is prepared to host the camera output.
 
 ```java
 public class MainActivity extends AppCompatActivity implements TextureView.SurfaceTextureListener, StreamingRecordObserver
@@ -176,7 +176,103 @@ CameraController.getInstance().switchCamera();
 
 Finally, the useful methods to implement in this case from the `StreamingRecordObserver´ could be ´onLocalStreamingAvailable´ and ´onLocalStreamingUnavailable´, in case we need to display a message or change anything when the stream is started and finished. 
 
-## How to receive streams 
+## How to receive audio and video streams from other devices
 
-//TODO
+This example is extracted from [this simple app](htpps://github.com/verdx/libstreaming2.0-examples#Example2-receiver). This Activity could also be a Fragment.
+
+The `StreamingRecordObserver´ is needed in this case to listen on when an external stream has been received or has ended. 
+
+```java
+public class MainActivity extends AppCompatActivity implements StreamingRecordObserver
+    ...
+```
+
+The xml for this activity may include a `RecyclerView` to display the received streams. All the needed classes to go with it are implemented in the library.
+
+```xml
+    ...
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/streamsList"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"/>
+    ...
+```
+
+The `onCreate´ method in this Activity or Fragment should include all of this initializations.
+
+```java
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+
+        ...
+
+        /*
+        Initialize the RecyclerView with an adapter and an array list
+         */
+        streamList = new ArrayList<>();
+        RecyclerView streamsListView = this.findViewById(R.id.streamsList);
+        streamsListView.setLayoutManager(new LinearLayoutManager(this));
+        addDefaultItemList();
+        arrayAdapter = new StreamListAdapter(this, streamList, this);
+        streamsListView.setAdapter(arrayAdapter);
+
+        /*
+        Initialize the StreamingRecord singleton and add this activity as an observer
+         */
+        StreamingRecord.getInstance().addObserver(this);
+
+        /*
+        Initialize the ViewModel, set the Incoming IPs(in this example from a EditText) and observe the network status
+         */
+        mViewModel = new DefaultViewModel(this.getApplication());
+        setIncomingIps();
+        mViewModel.isNetworkAvailable().observe(this, (Observer<Boolean>) aBoolean -> {
+            isNetworkAvailable = aBoolean;
+            mStatusTextView.setText(getDeviceStatus());
+            if(isNetworkAvailable){
+                mViewModel.initNetwork();
+            }
+        });
+    }
+```
+
+From the implemented methods from the `StreamingRecordObserver´, we only need to implement two, the rest can be empty in this case. We will add the received streams to the list when they are received and remove them when they are finished. We can also set the downloading state if we are using the default `StreamDetail`. If you want to remove some element you'll have to override a new `StreamDetail`
+
+```java
+        @Override
+    public void onStreamingAvailable(Streaming streaming, boolean bAllowDispatch) {
+        final String path = streaming.getUUID().toString();
+        this.runOnUiThread(() -> updateList(true,
+                path,
+                streaming.getName(),
+                streaming.getReceiveSession().getDestinationAddress().toString(),
+                streaming.getReceiveSession().getDestinationPort(),
+                streaming.isDownloading()));
+    }
+
+    @Override
+    public void onStreamingUnavailable(Streaming streaming) {
+        final String path = streaming.getUUID().toString();
+        this.runOnUiThread(() -> updateList(false,
+                path,
+                streaming.getName(),
+                streaming.getReceiveSession().getDestinationAddress().toString(),
+                streaming.getReceiveSession().getDestinationPort(),
+                streaming.isDownloading()));
+    }
+
+    @Override
+    public void onStreamingDownloadStateChanged(Streaming streaming, boolean bIsDownloading) {
+        final String path = streaming.getUUID().toString();
+        this.runOnUiThread(() -> setStreamDownload(path, bIsDownloading));
+    }
+```
+
+To update the list you will have to create a `StreamDetail` and add it to the list. The same for removing it. Finally, you will have to set the list to the adapter.
+```java
+StreamDetail detail = new StreamDetail(uuid, name, ip, port, download);
+streamList.add(detail);
+streamList.remove(detail);
+arrayAdapter.setStreamsData(streamList);
+```
 
