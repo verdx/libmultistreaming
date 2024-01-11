@@ -87,6 +87,9 @@ public class RTSPServerWorker extends AbstractWorker {
     // Parse the uri
     public static final Pattern regexUrlMethodAux = Pattern.compile("rtsp://(\\S+)/(\\S+)/(\\S+)",Pattern.CASE_INSENSITIVE);
 
+    // Parse if line starts with req
+    public static final Pattern regexReq = Pattern.compile("req",Pattern.CASE_INSENSITIVE);
+
     /** Expresion regular para obtener los argumentos que vienen detras de la cabecera como:
      * Csec: 3
      * Session: 543545
@@ -593,6 +596,13 @@ public class RTSPServerWorker extends AbstractWorker {
                 throw new SocketException("Client disconnected");
             }
 
+            if (regexReq.matcher(line).find()) {
+                response.status = RtspResponse.STATUS_OK;
+                response.content = "OK";
+                dataReceived.getSelector().send(dataReceived.getSocket(), response.build().getBytes());
+                return;
+            }
+
             matcher = regexMethod.matcher(line);
             matcher.find();
             request.method = matcher.group(1);
@@ -636,7 +646,7 @@ public class RTSPServerWorker extends AbstractWorker {
             e.printStackTrace();
         } catch (IllegalStateException e) {
             response.status = RtspResponse.STATUS_BAD_REQUEST;
-            Log.e(TAG, "illegal state with line" + line.toString());
+            Log.e(TAG, "illegal state with line: " + line.toString());
             e.printStackTrace();
         }
 
