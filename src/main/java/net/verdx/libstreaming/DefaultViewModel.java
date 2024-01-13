@@ -10,6 +10,7 @@ import android.content.IntentFilter;
 import android.net.ConnectivityManager;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
+import android.util.Log;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -28,6 +29,7 @@ import net.verdx.libstreaming.network.DefaultNetwork;
 
 public class DefaultViewModel extends BasicViewModel {
 
+    private static final String TAG = "DefaultViewModel";
     private final DefaultNetwork mNetwork;
     public static String SERVER_IP = "";
     public static int SERVER_PORT = 8080;
@@ -65,14 +67,15 @@ public class DefaultViewModel extends BasicViewModel {
 
         if(mNetwork.startLocalServer()){
             Toast.makeText(getApplication().getApplicationContext(), "Server Started", Toast.LENGTH_SHORT).show();
+            Log.d(TAG, "Server Started");
         }else {
-            Toast.makeText(getApplication().getApplicationContext(), "ServerStart Error", Toast.LENGTH_LONG).show();
+            Log.e(TAG, "ServerStart Error");
         }
 
         if(mNetwork.startClient()){
-            Toast.makeText(getApplication().getApplicationContext(), "Client Started", Toast.LENGTH_SHORT).show();
+            Log.d(TAG, "Client Started");
         }else {
-            Toast.makeText(getApplication().getApplicationContext(), "ClientStart Error", Toast.LENGTH_LONG).show();
+            Log.e(TAG, "ClientStart Error");
         }
 
     }
