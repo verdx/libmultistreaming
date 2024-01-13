@@ -646,7 +646,11 @@ public class RTSPServerWorker extends AbstractWorker {
             e.printStackTrace();
         } catch (IllegalStateException e) {
             response.status = RtspResponse.STATUS_BAD_REQUEST;
-            Log.e(TAG, "illegal state with line: " + line.toString());
+            if (line!=null)
+                Log.e(TAG, "illegal state with line: " + line);
+            else
+                Log.e(TAG, "illegal state with line: null");
+
             e.printStackTrace();
         }
 
