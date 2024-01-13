@@ -66,7 +66,6 @@ public class DefaultViewModel extends BasicViewModel {
     public void initNetwork(){
 
         if(mNetwork.startLocalServer()){
-            Toast.makeText(getApplication().getApplicationContext(), "Server Started", Toast.LENGTH_SHORT).show();
             Log.d(TAG, "Server Started");
         }else {
             Log.e(TAG, "ServerStart Error");
