@@ -138,6 +138,14 @@ public class DefaultNetwork extends INetworkManager {
         return DEFAULT_PORT;
     }
 
+    public ArrayList<String> getDestinationIps() {
+        ArrayList<String> ips = new ArrayList<>();
+        for(DestinationInfo info: DestinationIPReader.mDestinationList){
+            ips.add(info.ip);
+        }
+        return ips;
+    }
+
     private static class DestinationInfo{
         private final String ip;
         private final int port;

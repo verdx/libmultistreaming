@@ -1,6 +1,7 @@
 package net.verdx.libstreaming;
 
 import android.content.Context;
+import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -14,6 +15,7 @@ import net.verdx.libstreaming.sessions.SessionBuilder;
 public class StreamingRecord {
 
     static private StreamingRecord INSTANCE = null;
+    static private String TAG = "StreamingRecord";
 
     private static class Record{
         private Streaming mStreaming;
@@ -97,6 +99,7 @@ public class StreamingRecord {
         mLocalStreamingName = name;
         mLocalStreamingBuilder = sessionBuilder;
         for(StreamingRecordObserver ob : mObservers){
+            Log.d(TAG, "Making stream available in observer: " + ob.toString());
             ob.onLocalStreamingAvailable(id, name ,sessionBuilder);
         }
     }

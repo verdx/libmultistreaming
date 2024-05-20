@@ -133,4 +133,8 @@ public class DefaultViewModel extends BasicViewModel {
     public void setDestinationIpsStream(InputStream stream){
         mNetwork.setDestinationIpsStream(stream);
     }
+
+    public ArrayList<String> getDestinationIps() {
+        return mNetwork.getDestinationIps();
+    }
 }
