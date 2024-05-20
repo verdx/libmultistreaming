@@ -16,6 +16,7 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.lifecycle.MutableLiveData;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
@@ -65,18 +66,16 @@ public class DefaultViewModel extends BasicViewModel {
     @Override
     public void initNetwork(){
 
-        if(mNetwork.startLocalServer()){
+        try{
+            mNetwork.startLocalServer();
+            Toast.makeText(getApplication().getApplicationContext(), "Server Started", Toast.LENGTH_SHORT).show();
             Log.d(TAG, "Server Started");
-        }else {
-            Log.e(TAG, "ServerStart Error");
+        } catch (IOException e) {
+            Log.e(TAG, "ServerStart Error: " + e.getMessage());
         }
 
-        if(mNetwork.startClient()){
-            Log.d(TAG, "Client Started");
-        }else {
-            Log.e(TAG, "ClientStart Error");
-        }
-
+        mNetwork.startClient();
+        Log.d(TAG, "Client Started");
     }
 
     @Override

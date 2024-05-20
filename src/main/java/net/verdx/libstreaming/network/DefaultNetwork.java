@@ -9,6 +9,7 @@ import android.net.TransportInfo;
 import android.os.Build;
 import android.os.Handler;
 import android.os.HandlerThread;
+import android.util.Log;
 
 import androidx.preference.PreferenceManager;
 
@@ -74,26 +75,21 @@ public class DefaultNetwork extends INetworkManager {
         mClients.put(dest.ip, client);
     }
 
-    public boolean startLocalServer(){
+    public void startLocalServer() throws IOException{
         synchronized (DefaultNetwork.this){
-            try {
-                if (mServerModel == null) {
-                    mServerModel = new RTSPServerModel(getConnectivityManager());
-                    mServerModel.startServer();
-                }
-
-                if (!mServerModel.addNewConnection("127.0.0.1", 1234)) {
-                    throw new IOException();
-                }
-            } catch (IOException e) {
-                return false;
+            if (mServerModel == null) {
+                mServerModel = new RTSPServerModel(getConnectivityManager());
+                mServerModel.startServer();
             }
+
+            Log.e("DefaultNetwork", "Adding new connection, addres: " + "127.0.0.1");
+            mServerModel.addNewConnection("127.0.0.1", 1234);
         }
 
         if(mServerModel.isServerEnabled()) {
-            return mServerModel.addNewConnection();
+            mServerModel.addNewConnection();
         } else {
-            return false;
+            throw new IOException("Server not enabled");
         }
     }
 
@@ -101,7 +97,7 @@ public class DefaultNetwork extends INetworkManager {
         mServerModel.stopServer();
     }
 
-    public boolean startClient() {
+    public void startClient() {
         int delayms = 10000;
         workerHandle.postDelayed(new Runnable() {
             public void run() {
@@ -109,8 +105,6 @@ public class DefaultNetwork extends INetworkManager {
                 workerHandle.postDelayed(this, delayms);
             }
         }, delayms);
-
-        return true;
     }
 
     public void stopClient() {

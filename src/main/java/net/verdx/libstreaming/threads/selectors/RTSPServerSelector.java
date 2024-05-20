@@ -38,23 +38,18 @@ public class RTSPServerSelector extends AbstractSelector {
         return mEnabled;
     }
 
-    public synchronized boolean addNewConnection(String serverIP, int serverPort){
+    public synchronized void addNewConnection(String serverIP, int serverPort) throws IOException {
 
-        if(!mEnabled.get()) return false;
-        ServerSocketChannel serverSocketChannel = null;
-        try {
-            serverSocketChannel = ServerSocketChannel.open();
-            serverSocketChannel.configureBlocking(false);
-            serverSocketChannel.socket().bind(new InetSocketAddress(serverIP ,serverPort));
-            this.addChangeRequest(new ChangeRequest(serverSocketChannel, ChangeRequest.REGISTER, SelectionKey.OP_ACCEPT));
-            mConnections.add(serverSocketChannel);
+        if (!mEnabled.get()) throw new IOException("Server not enabled");
+        ServerSocketChannel serverSocketChannel;
 
-            mController.addServerSocketChannel(serverSocketChannel);
+        serverSocketChannel = ServerSocketChannel.open();
+        serverSocketChannel.configureBlocking(false);
+        serverSocketChannel.socket().bind(new InetSocketAddress(serverIP, serverPort));
+        this.addChangeRequest(new ChangeRequest(serverSocketChannel, ChangeRequest.REGISTER, SelectionKey.OP_ACCEPT));
+        mConnections.add(serverSocketChannel);
 
-        } catch (IOException e) {
-            return false;
-        }
-        return true;
+        mController.addServerSocketChannel(serverSocketChannel);
     }
 
 

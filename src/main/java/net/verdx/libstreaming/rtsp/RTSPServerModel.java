@@ -29,8 +29,8 @@ public class RTSPServerModel {
         mServerChannelsMap = new HashMap<>();
     }
 
-    public synchronized boolean addNewConnection(String serverIP, int serverPort){
-        return mServer.addNewConnection(serverIP,serverPort);
+    public synchronized void addNewConnection(String serverIP, int serverPort) throws IOException {
+        mServer.addNewConnection(serverIP,serverPort);
     }
 
     public void addNewConnection(ServerSocketChannel serverSocketChannel, Connection conn) {
