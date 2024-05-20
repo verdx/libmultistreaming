@@ -103,6 +103,7 @@ public class DefaultViewModel extends BasicViewModel {
                 }
             }
         } catch (Exception e) {
+            mIsNetworkAvailable.postValue(Boolean.FALSE);
             e.printStackTrace();
         }
         mIsNetworkAvailable.postValue(Boolean.FALSE); // No se encontró una interfaz de red activa para acceder a direcciones IP
