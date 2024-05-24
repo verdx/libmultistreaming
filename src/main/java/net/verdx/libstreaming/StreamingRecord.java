@@ -53,7 +53,9 @@ public class StreamingRecord {
     public synchronized void addStreaming(Streaming streaming, boolean allowDispatch){
         Record record = new Record(streaming, allowDispatch, null);
         mRecords.put(streaming.getUUID(), record);
+        Log.d(TAG, "Adding stream to " + mObservers.size() + " observers");
         for(StreamingRecordObserver ob : mObservers){
+            Log.d(TAG, "Adding stream to observer: " + ob.toString());
             ob.onStreamingAvailable(streaming, allowDispatch);
         }
     }
@@ -98,6 +100,7 @@ public class StreamingRecord {
         mLocalStreamingUUID = id;
         mLocalStreamingName = name;
         mLocalStreamingBuilder = sessionBuilder;
+        Log.d(TAG, "Making stream available in " + mObservers.size() + " observers");
         for(StreamingRecordObserver ob : mObservers){
             Log.d(TAG, "Making stream available in observer: " + ob.toString());
             ob.onLocalStreamingAvailable(id, name ,sessionBuilder);
@@ -136,7 +139,9 @@ public class StreamingRecord {
     public synchronized Streaming removeStreaming(UUID id){
         Record rec =  mRecords.remove(id);
         if(rec != null){
+            Log.d(TAG, "Removing stream from " + mObservers.size() + " observers");
             for(StreamingRecordObserver ob : mObservers){
+                Log.d(TAG, "Removing in observer: " + ob.toString());
                 ob.onStreamingUnavailable(rec.mStreaming);
             }
             return rec.mStreaming;
@@ -145,12 +150,14 @@ public class StreamingRecord {
     }
 
     public synchronized void addObserver(StreamingRecordObserver ob){
-        mObservers.add(ob);
-        if(mLocalStreamingUUID != null){
-            ob.onLocalStreamingAvailable(mLocalStreamingUUID, mLocalStreamingName, mLocalStreamingBuilder);
-        }
-        for(Record rec : mRecords.values()){
-            ob.onStreamingAvailable(rec.mStreaming, rec.mAllowDispatch);
+        if(!mObservers.contains(ob)) {
+            mObservers.add(ob);
+            if (mLocalStreamingUUID != null) {
+                ob.onLocalStreamingAvailable(mLocalStreamingUUID, mLocalStreamingName, mLocalStreamingBuilder);
+            }
+            for (Record rec : mRecords.values()) {
+                ob.onStreamingAvailable(rec.mStreaming, rec.mAllowDispatch);
+            }
         }
     }
 

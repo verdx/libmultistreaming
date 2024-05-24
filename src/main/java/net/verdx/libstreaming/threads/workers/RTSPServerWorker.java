@@ -147,12 +147,16 @@ public class RTSPServerWorker extends AbstractWorker {
                 case "OPTIONS":
                     response.status = RtspResponse.STATUS_OK;
                     response.attributes = "Public: DESCRIBE,ANNOUNCE,SETUP,PLAY,RECORD,PAUSE,TEARDOWN\r\n";
+                    Log.i(TAG, "OPTIONS request received");
                     break;
                 case "DESCRIBE":
+                    Log.i(TAG, "DESCRIBE request received");
                     return DESCRIBE(request, channel);
                 case "ANNOUNCE":
+                    Log.i(TAG, "ANNOUNCE request received");
                     return ANNOUNCE(request, channel);
                 case "SETUP":
+                    Log.i(TAG, "SETUP request received");
                     if(requestSession != null) {
                         return SETUP(request, requestSession);
                     } else if(receiveSession != null) {
@@ -163,6 +167,7 @@ public class RTSPServerWorker extends AbstractWorker {
                         response.status = RtspResponse.STATUS_BAD_REQUEST;
                     break;
                 case "PLAY":
+                    Log.i(TAG, "PLAY request received");
                     if(requestSession != null)
                         return PLAY(requestSession, channel);
                     else if(rebroadcastSession != null)
@@ -171,10 +176,13 @@ public class RTSPServerWorker extends AbstractWorker {
                         response.status = RtspResponse.STATUS_BAD_REQUEST;
                     break;
                 case "RECORD":
+                    Log.i(TAG, "RECORD request received");
                     return RECORD(receiveSession, channel);
                 case "PAUSE":
+                    Log.i(TAG, "PAUSE request received");
                     return PAUSE();
                 case "TEARDOWN":
+                    Log.i(TAG, "TEARDOWN request received");
                     if(requestSession != null) {
                         return TEARDOWN(requestSession, channel);
                     } else if(receiveSession != null) {
@@ -185,6 +193,7 @@ public class RTSPServerWorker extends AbstractWorker {
                         response.status = RtspResponse.STATUS_BAD_REQUEST;
                     break;
                 default:
+                    Log.e(TAG, "Command unknown: " + request);
                     Logger.e("Command unknown: " + request);
                     response.status = RtspResponse.STATUS_BAD_REQUEST;
             }
@@ -527,6 +536,7 @@ public class RTSPServerWorker extends AbstractWorker {
             return response;
         }
 
+        Log.d(TAG, "IMPORTANT: Adding streaming to record");
         StreamingRecord.getInstance().addStreaming(mServerSessions.get(channel).get(UUID.fromString(receiveSession.getPath())), true);
 
         return response;
@@ -621,7 +631,7 @@ public class RTSPServerWorker extends AbstractWorker {
                 request.path = matcherAux.group(2);
             }
             else request.path = "";
-            Log.d(TAG, "path: " + request.path);
+            //Log.d(TAG, "path: " + request.path);
 
             // Parsing headers of the request
             while ( (line = inputReader.readLine()) != null && line.length()>3 && (matcher = rexegHeader.matcher(line)).find()) {
