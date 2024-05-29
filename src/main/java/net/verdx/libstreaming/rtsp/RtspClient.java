@@ -39,6 +39,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.Semaphore;
+import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -484,9 +485,7 @@ public class RtspClient implements StreamingRecordObserver {
 	}
 
 	@Override
-	public void onStreamingDownloadStateChanged(Streaming streaming, boolean bIsDownload) {
-
-	}
+	public void onStreamingDownloadStateChanged(Streaming streaming, boolean bIsDownload) {}
 
 	protected void sendLocalStreaming(){
 		if(mState == STATE_STARTED){
@@ -618,7 +617,7 @@ public class RtspClient implements StreamingRecordObserver {
 
 		mOutputStream.write(request.getBytes("UTF-8"));
 		mOutputStream.flush();
-		Response response = Response.parseResponse(mBufferedReader);
+		Response response = Response.safeParseResponse(mBufferedReader);
 
 		if (response.headers.containsKey("server")) {
 			Log.v(TAG,"RTSP server name:" + response.headers.get("server"));
@@ -669,7 +668,7 @@ public class RtspClient implements StreamingRecordObserver {
 
 			mOutputStream.write(request.getBytes("UTF-8"));
 			mOutputStream.flush();
-			response = Response.parseResponse(mBufferedReader);
+			response = Response.safeParseResponse(mBufferedReader);
 
 			if (response.status == 401) throw new SecurityException("Bad credentials !");
 
@@ -694,7 +693,7 @@ public class RtspClient implements StreamingRecordObserver {
 
 			mOutputStream.write(request.getBytes("UTF-8"));
 			mOutputStream.flush();
-			Response response = Response.parseResponse(mBufferedReader);
+			Response response = Response.safeParseResponse(mBufferedReader);
 			Matcher m;
 
 			if (response.headers.containsKey("session")) {
@@ -739,7 +738,7 @@ public class RtspClient implements StreamingRecordObserver {
 
 			mOutputStream.write(request.getBytes("UTF-8"));
 			mOutputStream.flush();
-			Response response = Response.parseResponse(mBufferedReader);
+			Response response = Response.safeParseResponse(mBufferedReader);
 			Matcher m;
 
 			if (response.headers.containsKey("session")) {
@@ -779,7 +778,7 @@ public class RtspClient implements StreamingRecordObserver {
 		Log.i(TAG,request.substring(0, request.indexOf("\r\n")));
 		mOutputStream.write(request.getBytes("UTF-8"));
 		mOutputStream.flush();
-		Response response =  Response.parseResponse(mBufferedReader);
+		Response response =  Response.safeParseResponse(mBufferedReader);
 		if (response.status == 403) {
 			Log.d(TAG, "Streaming " + path + " refused by server");
 			throw new RuntimeException("Streaming " + path + " refused by server");
@@ -794,7 +793,7 @@ public class RtspClient implements StreamingRecordObserver {
 		Log.i(TAG,request.substring(0, request.indexOf("\r\n")));
 		mOutputStream.write(request.getBytes("UTF-8"));
 		mOutputStream.flush();
-		Response.parseResponse(mBufferedReader);
+		Response.safeParseResponse(mBufferedReader);
 	}
 
 	/**
@@ -805,7 +804,7 @@ public class RtspClient implements StreamingRecordObserver {
 		Log.i(TAG,request.substring(0, request.indexOf("\r\n")));
 		mOutputStream.write(request.getBytes("UTF-8"));
 		mOutputStream.flush();
-		Response.parseResponse(mBufferedReader);
+		Response.safeParseResponse(mBufferedReader);
 	}
 
 	private String addHeaders(StreamingState st) {
@@ -936,6 +935,10 @@ public class RtspClient implements StreamingRecordObserver {
 			Log.d(TAG, "Response from server: "+response.status);
 
 			return response;
+		}
+
+		public static synchronized Response safeParseResponse(BufferedReader input) throws IOException, IllegalStateException, SocketException {
+			return parseResponse(input);
 		}
 	}
 
