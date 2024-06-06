@@ -2,20 +2,20 @@
 
 ## What's new
 
-**libstreaming2.0** is a forked repository from [libstreaming](https://github.com/fyhertz/libstreaming), offering some new functionalities and an easier use.
+**libmultistreaming** is a forked repository from [libstreaming](https://github.com/fyhertz/libstreaming), offering some new functionalities and an easier use.
 
 The main changes are the following:
   - The RTSP client and server have been modified so they can work together. This way, in the same app, you can send and receive different streams. 
   - A new class `StreamingRecord´ has been created where all streams, received and local, are stored. Classes can implement ´StreamingRecordObserver´ to be notified when a stream is received externally or a local stream is initiated.
   - Two new intermediary interfaces have been created,  `BasicViewModel´ and ´DefaultViewModel´, to manage the network on which the streams are going to be sent and received. Two default classes have been added, ´DefaultNetwork´ and ´DefaultViewModel´, which use the default network in the device and IP, but new implementations could be created, using other networks, such as Bluetooth or Wifi Direct.
   - An option to download the streams has also been created, using the class `SaveStream´. This class can be used to download both local or received streams.
-  - Following the example of repository [libstreaming-examples](https://github.com/fyhertz/libstreaming-examples), some usage examples of the new library have been added to a repository [libstreaming2.0-examples](https://github.com/verdx/libstreaming2.0-examples).
+  - Following the example of repository [libstreaming-examples](https://github.com/fyhertz/libstreaming-examples), some usage examples of the new library have been added to a repository [libmultistreaming-examples](https://github.com/verdx/libmultistreaming-examples).
   - The library is now also capable of "multi-hopping", automatically sending the received streams to other devices in the network.
   - This repository has been simplified and modified so it can be used as an external module in Android Studio easily.
 
 ## What it does
 
-**libstreaming2.0** is an API that allows you, with only a few lines of code, to stream the camera and/or microphone of an Android-powered device using RTP over UDP. It also allows us to receive streams from other devices at the same time, and even send them automatically to the rest of the devices in the network. It can be configured to download the local and/or received streams.
+**libmultistreaming** is an API that allows you, with only a few lines of code, to stream the camera and/or microphone of an Android-powered device using RTP over UDP. It also allows us to receive streams from other devices at the same time, and even send them automatically to the rest of the devices in the network. It can be configured to download the local and/or received streams.
 
 * Android 4.0 or more recent is required.
 * Supported encoders include H.264, H.263, AAC and AMR.
@@ -24,7 +24,7 @@ The main changes are the following:
 
 ## How does it work? You should read this, it's important!
 
-# Using libstreaming2.0 in your app
+# Using libmultistreaming in your app
 
 ## Required permissions and services
 
@@ -45,7 +45,7 @@ The main changes are the following:
 
 To include it in your application using Android Studio, clone this repository using:
 ```sh
-git clone https://github.com/verdx/libstreaming2.0
+git clone https://github.com/verdx/libmultistreaming
 ```
 
 , then open the menu `File-\>Project Structure-\>Modules-\>Add(+)-\>Import´ and select the folder where it was downloaded.
@@ -53,12 +53,12 @@ git clone https://github.com/verdx/libstreaming2.0
 It is recommended to add it as a submodule inside your own repository. This way if anyone clones your repository it will be easily downloaded. To do so run the following:
 
 ```sh
-$ git submodule add https://github.com/verdx/libstreaming2.0
+$ git submodule add https://github.com/verdx/libmultistreaming
 ```
 
 ## How to stream video and audio to other devices
 
-This example is extracted from [this simple app](https://github.com/verdx/libstreaming2.0-examples/blob/master/README.md#example-2---sender). This Activity could also be a Fragment.
+This example is extracted from [this simple app](https://github.com/verdx/libmultistreaming-examples/blob/master/README.md#example-2---sender). This Activity could also be a Fragment.
 
 Both the ´StreamingRecordObserver´ and ´TextureView.SurfaceTextureListener´ are technically optional in this case, but very recommended. The ´StreamingRecordObserver´ is used to be notified when a local stream has been started or ended. The ´TextureView.SurfaceTextureListener´ is used to be notified when the custom ´AutoFitTextureView´ is prepared to host the camera output.
 
@@ -178,7 +178,7 @@ Finally, the useful methods to implement in this case from the `StreamingRecordO
 
 ## How to receive audio and video streams from other devices
 
-This example is extracted from [this simple app](https://github.com/verdx/libstreaming2.0-examples/blob/master/README.md#example-2---receiver). This Activity could also be a Fragment.
+This example is extracted from [this simple app](https://github.com/verdx/libmultistreaming-examples/blob/master/README.md#example-2---receiver). This Activity could also be a Fragment.
 
 The `StreamingRecordObserver´ is needed in this case to listen on when an external stream has been received or has ended. 
 
